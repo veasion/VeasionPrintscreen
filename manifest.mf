@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: cn.veasion.main.Run
+Class-Path: lib/commons-beanutils-1.7.0.jar lib/commons-codec-1.9.jar lib/commons-collections-3.2.jar lib/commons-lang-2.3.jar lib/commons-logging-1.2.jar lib/ezmorph-1.0.6.jar lib/jintellitype-1.3.9.jar lib/json-lib-2.4-jdk15.jar
