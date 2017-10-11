@@ -1,7 +1,6 @@
 package cn.veasion.main;
 
 import java.awt.AWTException;
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -27,6 +26,7 @@ import cn.veasion.tools.FileFilter;
 import cn.veasion.tools.MouseTransferable;
 import cn.veasion.tools.Tools;
 import cn.veasion.util.Rect;
+import cn.veasion.util.StaticValue;
 import cn.veasion.util.face.ImageOperate;
 import cn.veasion.util.face.ImageTextBean;
 
@@ -50,7 +50,7 @@ public class Printscreen extends JDialog {
 	private Rect r = new Rect(this);// 矩形框对象
 
 	private JFileChooser jc;
-
+	
 	static {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -128,6 +128,10 @@ public class Printscreen extends JDialog {
 	 * 初始化，并结束截图
 	 */
 	public void finishAndinitialization() {
+		if(r.menu!=null){
+			this.getLayeredPane().remove(r.menu);
+			r.menu=null;
+		}
 		this.dispose();// 遗弃窗体
 		imageCache = null;// 清空缓存
 		// 重新构建选区
@@ -206,18 +210,38 @@ public class Printscreen extends JDialog {
 	public void fillImageForDevice(){
 		Rectangle re = r.getRect();
 		Image img=getScreenImage();
-		int width=625;
+		int width=StaticValue.deviceWidth;
 		if (re.width < width) {
 			BufferedImage buff=new BufferedImage(width, re.height, BufferedImage.TYPE_INT_RGB);
 			Graphics g=buff.getGraphics();
 			g.drawImage(img, 0, 0, re.width, re.height, null);
-			g.setColor(Color.white);
+			g.setColor(StaticValue.deviceColor);
 			g.fillRect(re.width, 0, width-re.width, re.height);
 			img=(Image)buff;
 		}
 		// 拷贝到剪切板里
 		Tools.clipboard.setContents(new MouseTransferable(img), null);
 		finishAndinitialization();// 回收资源
+	}
+	
+	/**
+	 * 画图工具 
+	 */
+	public void mspaintImage(){
+		try {
+			Tools.clipboard.setContents(new MouseTransferable(getScreenImage()), null);// 拷贝到剪切板里
+			Runtime.getRuntime().exec("mspaint");
+			Thread.sleep(500);
+			Robot r=new Robot();
+			r.keyPress(KeyEvent.VK_CONTROL);
+			r.keyPress(KeyEvent.VK_V);
+			r.keyRelease(KeyEvent.VK_V);
+			r.keyRelease(KeyEvent.VK_CONTROL);
+			r.delay(100);
+			finishAndinitialization();// 回收资源
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -230,7 +254,7 @@ public class Printscreen extends JDialog {
 			BufferedImage buff=new BufferedImage(re.width < 48 ? 50 : re.width, re.height < 48 ? 50 : re.height, BufferedImage.TYPE_INT_RGB);
 			Graphics g=buff.getGraphics();
 			g.drawImage(img, 0, 0, re.width, re.height, null);
-			g.setColor(Color.white);
+			g.setColor(StaticValue.deviceColor);
 			if(re.width<48){
 				g.fillRect(re.width, 0, 50-re.width, re.height);
 			}
@@ -238,19 +262,33 @@ public class Printscreen extends JDialog {
 				g.fillRect(0, re.height, re.width < 48 ? 50 : re.width, 50 - re.height);
 			}
 			img=(Image)buff;
-		}
-		ImageOperate imgOpe=new ImageOperate();
-		try {
-			Tools.clipboard.setContents(new StringSelection("正在识别.."), null);
-			ImageTextBean textBean=imgOpe.textRecognition(img);
-			String text=textBean.getTextStr();
-			Tools.clipboard.setContents(new StringSelection(text), null);
-			System.out.println(text);
-			// 回收资源
+		} else if (re.width > 800 || re.height > 800){
+			Tools.clipboard.setContents(new StringSelection("识别失败：图片不能超过800*800"), null);
 			finishAndinitialization();
-		} catch (Exception e) {
-			e.printStackTrace();
+			return;
 		}
+		final Image imgTemp=img;
+		Thread t=new Thread(()->{
+			try{
+				ImageOperate imgOpe=new ImageOperate(StaticValue.faceApiKey, StaticValue.faceApiSecret);
+				Tools.clipboard.setContents(new StringSelection("正在识别.."), null);
+				ImageTextBean textBean=imgOpe.textRecognition(imgTemp);
+				String text=textBean.getTextStr();
+				Tools.clipboard.setContents(new StringSelection(text), null);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		});
+		t.start();
+		
+		/*
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}*/
+		
+		finishAndinitialization();
 	}
 	
 }

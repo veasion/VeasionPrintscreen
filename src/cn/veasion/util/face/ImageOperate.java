@@ -17,10 +17,8 @@ public class ImageOperate {
     public final static String IMAGE_RE = "https://api-cn.faceplusplus.com/imagepp/beta/detectsceneandobject";
     public final static String TEXT_RE = "https://api-cn.faceplusplus.com/imagepp/beta/recognizetext";
 
-    private String apiKey="rGhXZjSqWLOluq04axCW80jCm21I-j32";
-    private String apiSecret="imOWbNz3RUJ8GcIepLdVvxvoFrJsS9e-";
-    
-    public ImageOperate(){}
+    private String apiKey;
+    private String apiSecret;
     
     public ImageOperate(String apiKey, String apiSecret){
         this.apiKey = apiKey;

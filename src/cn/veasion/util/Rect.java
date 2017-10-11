@@ -29,7 +29,7 @@ public class Rect {
 	private int screenWidth = Tools.SCREEN_WIDTH;// 屏幕的宽度
 	private int screenHeight = Tools.SCREEN_HEIGHT;// //屏幕的高度
 	private Printscreen ps;
-	private JPanel menu;
+	public JPanel menu;
  
 	private int leftUpX;// 左上角x
 	private int leftUpY;// 左上角y
@@ -259,12 +259,12 @@ public class Rect {
 				ps.setCursor(D);//设置鼠标默认状态
 			}
 			// 显示功能菜单
-			if (leftUpX + 520 > screenWidth && leftUpY+height + 31 < screenHeight) {
-				showMouseMenu(new Rectangle(screenWidth-522, leftUpY+height+10, 520, 30));
-			}else if (leftUpY+height + 31 > screenHeight && leftUpX + 520 < screenWidth) {
-				showMouseMenu(new Rectangle(leftUpX, leftUpY-40, 520, 30));
-			}else if(leftUpX + 520 > screenWidth){
-				showMouseMenu(new Rectangle(screenWidth-522, leftUpY-40, 520, 30));
+			if (leftUpX + 560 > screenWidth && leftUpY+height + 31 < screenHeight) {
+				showMouseMenu(new Rectangle(screenWidth-562, leftUpY+height+10, 560, 30));
+			}else if (leftUpY+height + 31 > screenHeight && leftUpX + 560 < screenWidth) {
+				showMouseMenu(new Rectangle(leftUpX, leftUpY-40, 560, 30));
+			}else if(leftUpX + 560 > screenWidth){
+				showMouseMenu(new Rectangle(screenWidth-562, leftUpY-40, 560, 30));
 			}else{
 				showMouseMenu(null);
 			}
@@ -281,7 +281,7 @@ public class Rect {
 		if(r!=null){
 			menu.setBounds(r);
 		}else{
-			menu.setBounds(leftUpX, leftUpY + height + 10, 520, 30);
+			menu.setBounds(leftUpX, leftUpY + height + 10, 560, 30);
 		}
 		ps.getLayeredPane().remove(menu);
 		ps.getLayeredPane().add(menu, new Integer(Integer.MAX_VALUE));
@@ -303,6 +303,7 @@ public class Rect {
 		fill.setToolTipText("截图自适应设备（620~460）");
 		JButton ocr=new JButton("文字识别");
 		JButton complete=new JButton("完成");
+		JButton mspaint=new JButton("画图");
 		
 		complete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -329,9 +330,15 @@ public class Rect {
 				ps.ocrImage();
 			}
 		});
+		mspaint.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ps.mspaintImage();
+			}
+		});
 		menu.add(label);
 		menu.add(exit);
 		menu.add(save);
+		menu.add(mspaint);
 		menu.add(fill);
 		menu.add(ocr);
 		menu.add(complete);
