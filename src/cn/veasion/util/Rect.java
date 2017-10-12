@@ -283,6 +283,8 @@ public class Rect {
 		}else{
 			menu.setBounds(leftUpX, leftUpY + height + 10, 560, 30);
 		}
+		// 清空选中矩形
+		ps.clearSelectRect();
 		ps.getLayeredPane().remove(menu);
 		ps.getLayeredPane().add(menu, new Integer(Integer.MAX_VALUE));
 		

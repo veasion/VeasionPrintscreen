@@ -1,8 +1,10 @@
 package cn.veasion.main;
 
 import java.awt.AWTException;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Robot;
@@ -27,7 +29,9 @@ import cn.veasion.tools.MouseTransferable;
 import cn.veasion.tools.Tools;
 import cn.veasion.util.ImageUtil;
 import cn.veasion.util.Rect;
+import cn.veasion.util.SelectRect;
 import cn.veasion.util.StaticValue;
+import cn.veasion.util.VeaUtil;
 import cn.veasion.util.face.ImageOperate;
 import cn.veasion.util.face.ImageTextBean;
 
@@ -45,11 +49,15 @@ public class Printscreen extends JDialog {
 	private int screenWidth = Tools.SCREEN_WIDTH;
 	private int screenHeight = Tools.SCREEN_HEIGHT;
 
-	private BufferedImage imageCache;// 截图缓存对象
+	// 截图缓存对象
+	private BufferedImage imageCache;
 
-	// 截图帮助工具
-	private Rect r = new Rect(this);// 矩形框对象
+	// 截图矩形框
+	private Rect r = new Rect(this);
 
+	// 选中小矩形
+	private SelectRect sr=new SelectRect(this, r);
+	
 	private JFileChooser jc;
 	
 	static {
@@ -59,13 +67,13 @@ public class Printscreen extends JDialog {
 			e.printStackTrace();
 		}
 	}
-
+	
 	public Printscreen() {
 		this.setLayout(null);
 		// 不显示窗体装饰
 		this.setUndecorated(true);
 		this.setBounds(0, 0, screenWidth, screenHeight);
-
+		
 		this.setContentPane(new JPanel() {
 			private static final long serialVersionUID = 1L;
 			
@@ -83,25 +91,38 @@ public class Printscreen extends JDialog {
 				g.drawImage(imageCache, 0, 0, screenWidth, screenHeight, null);
 				// 绘制矩形
 				r.drawRect(g);
+				// 绘制选中小矩形
+				if(r.menu != null){
+					sr.drawRect(g);
+				}
 			}
 		});
 
 		this.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				r.mousePressed(e);// 传递事件给选区
+				if(r.menu != null){
+					sr.mousePressed(e);
+				}
 				if (e.getClickCount() == 2) {
 					copyInShearPlate();// 复制到剪切板
 				}
 			}
 			public void mouseReleased(MouseEvent e) {// 鼠标按键弹起
 				r.mouseReleased(e);
+				if(r.menu != null){
+					sr.mousePressed(e);
+				}
 			}
 		});
 
 		this.addMouseMotionListener(new MouseMotionListener() {
 			public void mouseDragged(MouseEvent e) {
 				r.mouseDragged(e);
-				repaint();// 拖拽时必须重绘,如果是局部重绘，就会出现影子显现,只有牺牲效率了
+				if(r.menu != null){
+					sr.mouseDragged(e);
+				}
+				repaint();
 			}
 			public void mouseMoved(MouseEvent e) {
 				r.mouseMoved(e);// 矩形选区鼠标移动事件
@@ -111,8 +132,9 @@ public class Printscreen extends JDialog {
 		this.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == 27) {// ESC键
-					finishAndinitialization();// 初始化
+					finishAndinitialization();
 				}
+				sr.keyReleased(e);
 			}
 		});
 
@@ -139,6 +161,7 @@ public class Printscreen extends JDialog {
 		imageCache = null;// 清空缓存
 		// 重新构建选区
 		this.r = new Rect(this);
+		this.sr=new SelectRect(this, r);
 	}
 	
 	/**
@@ -185,7 +208,7 @@ public class Printscreen extends JDialog {
 				imageCache = (BufferedImage) getScreenImage();
 				ImageIO.write(imageCache, ends, newFile);
 			} catch (IOException e) {
-				System.err.println("save failed! ");
+				System.err.println("保存发生错误! ");
 				saveImageFile();
 			}
 		} else if (result == JFileChooser.CANCEL_OPTION) {// 取消按钮
@@ -204,7 +227,20 @@ public class Printscreen extends JDialog {
 	 */
 	public Image getScreenImage() {
 		Rectangle re = r.getRect();
-		return imageCache.getSubimage(re.x, re.y, re.width, re.height);
+		BufferedImage images=imageCache.getSubimage(re.x, re.y, re.width, re.height);
+		if(!VeaUtil.isNullEmpty(sr.getRectangles())){
+			// 清除操作
+			BufferedImage buff=new BufferedImage(re.width, re.height, BufferedImage.TYPE_INT_RGB);
+			Graphics g=buff.getGraphics();
+			g.drawImage(images, 0, 0, null);
+			g.setColor(Color.white);
+			for (Rectangle rec : sr.getRectangles()) {
+				g.fillRect((int)(rec.getX()-re.getX()), (int)(rec.getY()-re.getY()), (int)rec.getWidth(), (int)rec.getHeight());
+			}
+			return buff;
+		}else{
+			return images;
+		}
 	}
 	
 	/**
@@ -302,6 +338,10 @@ public class Printscreen extends JDialog {
 		}*/
 		
 		finishAndinitialization();
+	}
+	
+	public void clearSelectRect(){
+		sr=new SelectRect(this, r);
 	}
 	
 }
