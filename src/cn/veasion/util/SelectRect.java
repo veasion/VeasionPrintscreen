@@ -41,7 +41,7 @@ public class SelectRect {
 		this.temp=this.getRect();
 		g.drawRect(leftUpX, leftUpY, rightDownX-leftUpX, rightDownY-leftUpY);
 		for (Rectangle re : rectangles) {
-			g.setColor(Color.white);
+			g.setColor(StaticValue.deviceBgColor);
 			g.fillRect((int)re.getX(), (int)re.getY(), (int)re.getWidth(), (int)re.getHeight());
 		}
 	}

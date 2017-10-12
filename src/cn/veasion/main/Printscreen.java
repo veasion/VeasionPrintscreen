@@ -133,6 +133,11 @@ public class Printscreen extends JDialog {
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == 27) {// ESC键
 					finishAndinitialization();
+				}else if(e.getKeyCode() == 90){// Z 撤销
+					if(!VeaUtil.isNullEmpty(sr.getRectangles())){
+						sr.getRectangles().remove(sr.getRectangles().size()-1);
+						repaint();
+					}
 				}
 				sr.keyReleased(e);
 			}
@@ -233,7 +238,7 @@ public class Printscreen extends JDialog {
 			BufferedImage buff=new BufferedImage(re.width, re.height, BufferedImage.TYPE_INT_RGB);
 			Graphics g=buff.getGraphics();
 			g.drawImage(images, 0, 0, null);
-			g.setColor(Color.white);
+			g.setColor(StaticValue.deviceBgColor);
 			for (Rectangle rec : sr.getRectangles()) {
 				g.fillRect((int)(rec.getX()-re.getX()), (int)(rec.getY()-re.getY()), (int)rec.getWidth(), (int)rec.getHeight());
 			}
@@ -255,7 +260,7 @@ public class Printscreen extends JDialog {
 			BufferedImage buff=new BufferedImage(width, re.height, BufferedImage.TYPE_INT_RGB);
 			Graphics g=buff.getGraphics();
 			g.drawImage(img, 0, 0, re.width, re.height, null);
-			g.setColor(StaticValue.deviceColor);
+			g.setColor(StaticValue.deviceBgColor);
 			g.fillRect(re.width, 0, width-re.width, re.height);
 			img=(Image)buff;
 		}else{
@@ -297,7 +302,7 @@ public class Printscreen extends JDialog {
 			BufferedImage buff=new BufferedImage(re.width < 48 ? 50 : re.width, re.height < 48 ? 50 : re.height, BufferedImage.TYPE_INT_RGB);
 			Graphics g=buff.getGraphics();
 			g.drawImage(img, 0, 0, re.width, re.height, null);
-			g.setColor(StaticValue.deviceColor);
+			g.setColor(StaticValue.deviceBgColor);
 			if(re.width<48){
 				g.fillRect(re.width, 0, 50-re.width, re.height);
 			}
@@ -330,12 +335,13 @@ public class Printscreen extends JDialog {
 		});
 		t.start();
 		
-		/*
-		try {
-			t.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}*/
+		if(StaticValue.ocrModel==0){
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		
 		finishAndinitialization();
 	}
