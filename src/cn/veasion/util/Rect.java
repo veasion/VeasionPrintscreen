@@ -225,6 +225,8 @@ public class Rect {
 				if( rightDownX > screenWidth)  rightDownX = screenWidth;
 				if( rightDownY > screenHeight) rightDownY = screenHeight;
 			}
+			// 清空选中矩形
+			ps.clearSelectRect();
 		}
 		
 		//判断矩形是否反向，相反就复位
@@ -295,8 +297,8 @@ public class Rect {
 		GridLayout grid=new GridLayout(1, 0);
 		menu.setLayout(grid);
 		Font f=new Font("华文楷体", 1, 15);
-		JLabel label=new JLabel("麦穗", JLabel.CENTER);
-		label.setToolTipText("麦穗题库录入截图工具 --Veasion");
+		JLabel label=new JLabel("伟神", JLabel.CENTER);
+		label.setToolTipText("伟神题库录入截图工具 --Veasion");
 		label.setForeground(new Color(237, 100, 20));
 		label.setFont(f);
 		JButton exit=new JButton("退出");
@@ -338,12 +340,12 @@ public class Rect {
 			}
 		});
 		menu.add(label);
-		menu.add(exit);
-		menu.add(save);
-		menu.add(mspaint);
-		menu.add(fill);
-		menu.add(ocr);
 		menu.add(complete);
+		menu.add(ocr);
+		menu.add(fill);
+		menu.add(mspaint);
+		menu.add(save);
+		menu.add(exit);
 	}
 	
 }

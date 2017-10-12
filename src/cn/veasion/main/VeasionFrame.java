@@ -31,7 +31,7 @@ public class VeasionFrame extends JFrame{
 	
 	public VeasionFrame(){
 		this.setLayout(new GridLayout(0, 2));
-		this.setTitle("麦穗截图工具 --Veasion");
+		this.setTitle("伟神截图工具 --Veasion");
 		this.setLocationRelativeTo(null);
 		this.add(new JLabel("文字识别模式："));
 		JComboBox<String> cbx1=new JComboBox<>(new String[]{"前台", "后台"});
@@ -47,10 +47,10 @@ public class VeasionFrame extends JFrame{
 					super.keyReleased(e);
 				} else {
 					tf1.setText(tf1.getText().replaceAll("\\D+", ""));
-					int v=VeaUtil.valueOfInt(tf1.getText(), 0);
-					if (v <= 0 && v > 5000) {
-						tf1.setText("730");
-					}
+				}
+				int v=VeaUtil.valueOfInt(tf1.getText(), 0);
+				if (v <= 0 || v > 5000) {
+					tf1.setText("730");
 				}
 			}
 		});
@@ -59,7 +59,6 @@ public class VeasionFrame extends JFrame{
 		JTextField tf2=new JTextField(" Ctrl + B");
 		tf2.setEnabled(false);
 		this.add(tf2);
-		
 		this.add(new JLabel("自适应背景："));
 		JComboBox<String> cbx2=new JComboBox<>(new String[]{"白色", "黑色"});
 		cbx2.setSelectedIndex(StaticValue.deviceBgColor==Color.black ? 1 : 0);
@@ -70,7 +69,7 @@ public class VeasionFrame extends JFrame{
 		b1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				cbx1.setSelectedIndex(0);
+				cbx1.setSelectedIndex(1);
 				cbx2.setSelectedIndex(0);
 				tf1.setText("730");
 				b2.doClick();
