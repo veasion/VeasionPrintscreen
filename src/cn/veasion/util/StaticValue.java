@@ -20,7 +20,7 @@ public class StaticValue {
 	/**
 	 * 自适应设备宽度 
 	 */
-	public static final int deviceWidth=625;
+	public static final int deviceWidth=630;
 	
 	/**
 	 * 自适应颜色

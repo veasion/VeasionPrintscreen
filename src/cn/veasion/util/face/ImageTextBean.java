@@ -8,12 +8,12 @@ import net.sf.json.JSONObject;
 import cn.veasion.util.VeaUtil;
 
 /**
- * 文字识别 
+ * 文字识别排序
  * 
  * @author zhuowei.luo
  */
 public class ImageTextBean {
-
+	
 	private int status;
 	private String message;
 	private JSONObject json;
@@ -54,25 +54,55 @@ public class ImageTextBean {
 			tv.setType(j.optString("type"));
 			tv.setValue(j.optString("value"));
 			try{
-				JSONObject xy=j.optJSONArray("child-objects").getJSONObject(0).optJSONArray("position").getJSONObject(0);
-				tv.setX(xy.optInt("x", 0));
-				tv.setY(xy.optInt("y", 0));
+				JSONArray childs=j.optJSONArray("child-objects");
+				int minX = -1, maxX = 0, minY = -1, maxY = 0;
+				for (Object child : childs) {
+					JSONObject object=JSONObject.fromObject(child);
+					JSONArray positions=object.optJSONArray("position");
+					for (Object position : positions) {
+						JSONObject positionJson=JSONObject.fromObject(position);
+						int x=positionJson.optInt("x", 0);
+						int y=positionJson.optInt("y", 0);
+						if (minX == -1) {
+							minX = x;
+						} else if (x < minX) {
+							minX = x;
+						}
+						if (minY == -1) {
+							minY = y;
+						} else if (y < minY) {
+							minY = y;
+						}
+						if (x > maxX) {
+							maxX = x;
+						}
+						if (y > maxY) {
+							maxY = y;
+						}
+					}
+				}
+				tv.setX(minX);
+				tv.setY(minY);
+				tv.setW(maxX-minX);
+				tv.setH(maxY-minY);
 			}catch(Exception e){
 				e.printStackTrace();
 			}
 			textList.add(tv);
 		}
+		
 		// 文字识别，排序
-		textList.sort((t1,t2)->{
-			if(t1.getY()>t2.getY()){
-				if(jdz(t1.getY()-t2.getY())<10)
+		textList.sort((t1, t2)->{
+			int maxFontHeight = this.maxFontHeight();
+			if (t1.getY() > t2.getY()) {
+				if (jdz(t1.getY() - t2.getY()) < maxFontHeight)
 					return sortX(t1, t2);
 				else
 					return 1;
-			}else if(t1.getY()==t2.getY()){
+			} else if (t1.getY() == t2.getY()) {
 				return sortX(t1, t2);
-			}else{
-				if(jdz(t1.getY()-t2.getY())<10)
+			} else {
+				if (jdz(t1.getY() - t2.getY()) < maxFontHeight)
 					return sortX(t1, t2);
 				else
 					return -1;
@@ -82,17 +112,25 @@ public class ImageTextBean {
 	
 	// 排序X坐标
 	private int sortX(TextValue t1,TextValue t2){
-		if(t1.getX()==t2.getX())
+		if (t1.getX() == t2.getX())
 			return 0;
-		else if(t1.getX()>t2.getX())
+		else if (t1.getX() > t2.getX())
 			return 1;
-		else return -1;
+		else
+			return -1;
 	}
 	
 	// 绝对值
 	private int jdz(int xxx){
-		if(xxx<0) return -xxx;
-		else return xxx;
+		if (xxx < 0)
+			return -xxx;
+		else
+			return xxx;
+	}
+	
+	// 最大
+	private int max(int x, int y){
+		return x > y ? x : y;
 	}
 	
 	public int getStatus() {
@@ -110,56 +148,80 @@ public class ImageTextBean {
 	
 	/**获取text for html*/
 	public String getTextHtml(){
-		if(!VeaUtil.isNullEmpty(textList)){
-			StringBuilder sb=new StringBuilder();
-			int y=textList.get(0).getY();
+		int avgFontHeight = this.avgFontHeight();
+		if (!VeaUtil.isNullEmpty(textList)) {
+			StringBuilder sb = new StringBuilder();
+			int y = textList.get(0).getY();
 			for (TextValue tv : textList) {
-				if(tv.getY()>y+10){
-					y=tv.getY();
+				if (tv.getY() > y + avgFontHeight) {
+					y = tv.getY();
 					sb.append("<br/>");
 				}
 				sb.append(tv.value).append("&nbsp;");
 			}
 			return sb.toString();
-		}else if (this.status != 200) {
-			return "识别识别："+this.getStatus();
-		}else{
+		} else if (this.status != 200) {
+			return "识别识别：" + this.getStatus();
+		} else {
 			return "";
 		}
 	}
 	
 	/**获取text，没有换行*/
 	public String getText(){
-		if(!VeaUtil.isNullEmpty(textList)){
-			StringBuilder sb=new StringBuilder();
+		if (!VeaUtil.isNullEmpty(textList)) {
+			StringBuilder sb = new StringBuilder();
 			for (TextValue tv : textList) {
 				sb.append(tv.value).append(" ");
 			}
 			return sb.toString();
-		}else if (this.status != 200) {
-			return "识别识别："+this.getStatus();
-		}else{
+		} else if (this.status != 200) {
+			return "识别识别：" + this.getStatus();
+		} else {
 			return "";
 		}
 	}
 	
 	/**获取text，有换行\n*/
 	public String getTextStr(){
-		if(!VeaUtil.isNullEmpty(textList)){
-			StringBuilder sb=new StringBuilder();
-			int y=textList.get(0).getY();
+		int avgFontHeight = this.avgFontHeight();
+		if (!VeaUtil.isNullEmpty(textList)) {
+			StringBuilder sb = new StringBuilder();
+			int y = textList.get(0).getY();
 			for (TextValue tv : textList) {
-				if(tv.getY()>y+10){
-					y=tv.getY();
+				if (tv.getY() > y + avgFontHeight) {
+					y = tv.getY();
 					sb.append("\n");
 				}
 				sb.append(tv.value).append(" ");
 			}
 			return sb.toString();
-		}else if (this.status != 200) {
-			return "识别识别："+this.getStatus();
-		}else{
+		} else if (this.status != 200) {
+			return "识别识别：" + this.getStatus();
+		} else {
 			return "";
+		}
+	}
+	
+	/**
+	 * 获取平均字体高度
+	 */
+	private int avgFontHeight(){
+		if(!VeaUtil.isNullEmpty(textList)){
+			return textList.stream().mapToInt((v)->v.getH()).sum() / textList.size();
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
+	 * 获取最大字体高度 
+	 */
+	private int maxFontHeight(){
+		if(!VeaUtil.isNullEmpty(textList)){
+			return textList.stream().mapToInt((v)->v.getH()).max().orElse(0);
+		}else{
+			return 0;
 		}
 	}
 	
@@ -171,6 +233,8 @@ public class ImageTextBean {
 	public class TextValue{
 		private int x;
 		private int y;
+		private int w;
+		private int h;
 		private String value;
 		private String type;
 		
@@ -198,9 +262,24 @@ public class ImageTextBean {
 		public void setType(String type) {
 			this.type = type;
 		}
+		public void setW(int w) {
+			this.w = w;
+		}
+		public int getW() {
+			return w;
+		}
+		public void setH(int h) {
+			this.h = h;
+		}
+		public int getH() {
+			return h;
+		}
+		
 		@Override
 		public String toString() {
-			return "TextValue [x=" + x + ", y=" + y + ", value=" + value + ", type=" + type + "]";
+			return "TextValue [x=" + x + ", y=" + y + ", w=" + w + ", h=" + h + ", value=" + value + ", type=" + type
+					+ "]";
 		}
+		
 	}
 }

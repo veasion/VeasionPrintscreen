@@ -25,6 +25,7 @@ import javax.swing.UIManager;
 import cn.veasion.tools.FileFilter;
 import cn.veasion.tools.MouseTransferable;
 import cn.veasion.tools.Tools;
+import cn.veasion.util.ImageUtil;
 import cn.veasion.util.Rect;
 import cn.veasion.util.StaticValue;
 import cn.veasion.util.face.ImageOperate;
@@ -78,8 +79,10 @@ public class Printscreen extends JDialog {
 						System.out.println("Robot class create picture cache failed!");
 					}
 				}
-				g.drawImage(imageCache, 0, 0, screenWidth, screenHeight, null);// 绘制截图
-				r.drawRect(g);// 绘制矩形
+				// 绘制截图
+				g.drawImage(imageCache, 0, 0, screenWidth, screenHeight, null);
+				// 绘制矩形
+				r.drawRect(g);
 			}
 		});
 
@@ -212,12 +215,16 @@ public class Printscreen extends JDialog {
 		Image img=getScreenImage();
 		int width=StaticValue.deviceWidth;
 		if (re.width < width) {
+			// 填充
 			BufferedImage buff=new BufferedImage(width, re.height, BufferedImage.TYPE_INT_RGB);
 			Graphics g=buff.getGraphics();
 			g.drawImage(img, 0, 0, re.width, re.height, null);
 			g.setColor(StaticValue.deviceColor);
 			g.fillRect(re.width, 0, width-re.width, re.height);
 			img=(Image)buff;
+		}else{
+			// 压缩
+			img = ImageUtil.zoomImage((BufferedImage) img, (float) StaticValue.deviceWidth / re.width);
 		}
 		// 拷贝到剪切板里
 		Tools.clipboard.setContents(new MouseTransferable(img), null);
@@ -262,10 +269,16 @@ public class Printscreen extends JDialog {
 				g.fillRect(0, re.height, re.width < 48 ? 50 : re.width, 50 - re.height);
 			}
 			img=(Image)buff;
-		} else if (re.width > 800 || re.height > 800){
-			Tools.clipboard.setContents(new StringSelection("识别失败：图片不能超过800*800"), null);
+		} else if (re.width > 1200 || re.height > 1200){
+			Tools.clipboard.setContents(new StringSelection("识别失败：图片不能超过1200*1200"), null);
 			finishAndinitialization();
 			return;
+		} else if (re.width > 800 && re.width < 1200) {
+			// 压缩
+			img = ImageUtil.zoomImage((BufferedImage) img, (float) 800 / re.width);
+		} else if (re.height > 800 && re.height < 1200) {
+			// 压缩
+			img = ImageUtil.zoomImage((BufferedImage) img, (float) 800 / re.height);
 		}
 		final Image imgTemp=img;
 		Thread t=new Thread(()->{

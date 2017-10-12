@@ -307,7 +307,7 @@ public class Rect {
 		
 		complete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ps.copyInShearPlate();// 复制到剪切板
+				ps.copyInShearPlate();
 			}
 		});
 		save.addActionListener(new ActionListener() {
