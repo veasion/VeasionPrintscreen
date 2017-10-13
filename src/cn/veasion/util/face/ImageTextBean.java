@@ -161,7 +161,7 @@ public class ImageTextBean {
 			}
 			return sb.toString();
 		} else if (this.status != 200) {
-			return "识别识别：" + this.getStatus();
+			return "识别失败：" + this.getStatus();
 		} else {
 			return "";
 		}
@@ -176,7 +176,7 @@ public class ImageTextBean {
 			}
 			return sb.toString();
 		} else if (this.status != 200) {
-			return "识别识别：" + this.getStatus();
+			return "识别失败：" + this.getStatus();
 		} else {
 			return "";
 		}
@@ -197,7 +197,7 @@ public class ImageTextBean {
 			}
 			return sb.toString();
 		} else if (this.status != 200) {
-			return "识别识别：" + this.getStatus();
+			return "识别失败：" + this.getStatus();
 		} else {
 			return "";
 		}
@@ -280,6 +280,5 @@ public class ImageTextBean {
 			return "TextValue [x=" + x + ", y=" + y + ", w=" + w + ", h=" + h + ", value=" + value + ", type=" + type
 					+ "]";
 		}
-		
 	}
 }

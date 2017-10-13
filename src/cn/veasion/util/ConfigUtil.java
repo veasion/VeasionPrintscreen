@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -17,7 +15,7 @@ import java.util.Properties;
  */
 public class ConfigUtil {
 	
-	private static String configPath=System.getProperty("user.home")+File.separator+"veasionPrintscreen.properties";
+	public final static String configPath=System.getProperty("user.home")+File.separator+"veasionPrintscreen.properties";
 	
 	private static Properties p;
 	

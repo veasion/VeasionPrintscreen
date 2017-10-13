@@ -13,6 +13,8 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
+
+import cn.veasion.util.ConfigUtil;
 import cn.veasion.util.StaticValue;
 import cn.veasion.util.VeaUtil;
 
@@ -33,6 +35,10 @@ public class VeasionFrame extends JFrame{
 		this.setLayout(new GridLayout(0, 2));
 		this.setTitle("伟神截图工具 --Veasion");
 		this.setLocationRelativeTo(null);
+		this.add(new JLabel("文字识别引擎："));
+		JComboBox<String> cbx=new JComboBox<>(new String[]{"Face++", "百度云"});
+		cbx.setSelectedIndex(StaticValue.ocrEngine);
+		this.add(cbx);
 		this.add(new JLabel("文字识别模式："));
 		JComboBox<String> cbx1=new JComboBox<>(new String[]{"前台", "后台"});
 		cbx1.setSelectedIndex(StaticValue.ocrModel);
@@ -50,7 +56,7 @@ public class VeasionFrame extends JFrame{
 				}
 				int v=VeaUtil.valueOfInt(tf1.getText(), 0);
 				if (v <= 0 || v > 5000) {
-					tf1.setText("730");
+					tf1.setText("630");
 				}
 			}
 		});
@@ -63,31 +69,37 @@ public class VeasionFrame extends JFrame{
 		JComboBox<String> cbx2=new JComboBox<>(new String[]{"白色", "黑色"});
 		cbx2.setSelectedIndex(StaticValue.deviceBgColor==Color.black ? 1 : 0);
 		this.add(cbx2);
-		
+		this.add(new JLabel("配置文件："));
+		JTextField jtf=new JTextField(ConfigUtil.configPath);
+		jtf.setEnabled(false);
+		jtf.setToolTipText(jtf.getText());
+		this.add(jtf);
 		JButton b1=new JButton("重置");
 		JButton b2=new JButton("保存");
 		b1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				cbx.setSelectedIndex(0);
 				cbx1.setSelectedIndex(1);
 				cbx2.setSelectedIndex(0);
-				tf1.setText("730");
+				tf1.setText("630");
 				b2.doClick();
 			}
 		});
 		b2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				StaticValue.ocrEngine=cbx.getSelectedIndex();
 				StaticValue.ocrModel=cbx1.getSelectedIndex();
 				StaticValue.deviceBgColor = cbx2.getSelectedIndex() == 1 ? Color.black : Color.white;
-				StaticValue.deviceWidth=VeaUtil.valueOfInt(tf1.getText(), 730);
+				StaticValue.deviceWidth=VeaUtil.valueOfInt(tf1.getText(), 630);
 				StaticValue.write();
 			}
 		});
 		this.add(b1);
 		this.add(b2);
 		
-		this.setSize(300, 160);
+		this.setSize(300, 200);
 		this.setResizable(false);
 		
 		// 添加全局键盘监听钩子

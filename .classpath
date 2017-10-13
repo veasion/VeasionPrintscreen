@@ -10,5 +10,7 @@
 	<classpathentry kind="lib" path="lib/commons-codec-1.9.jar"/>
 	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
 	<classpathentry kind="lib" path="lib/jintellitype-1.3.9.jar"/>
+	<classpathentry kind="lib" path="lib/aip-java-sdk-3.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/json-20160810.jar" sourcepath="C:/Users/zhuowei.luo/.m2/repository/org/json/json/20160810/json-20160810-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

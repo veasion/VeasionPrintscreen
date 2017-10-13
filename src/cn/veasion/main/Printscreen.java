@@ -17,12 +17,15 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+
+import com.baidu.aip.ocr.AipOcr;
 
 import cn.veasion.tools.FileFilter;
 import cn.veasion.tools.MouseTransferable;
@@ -32,8 +35,10 @@ import cn.veasion.util.Rect;
 import cn.veasion.util.SelectRect;
 import cn.veasion.util.StaticValue;
 import cn.veasion.util.VeaUtil;
+import cn.veasion.util.baiduyun.TextResponseForBd;
 import cn.veasion.util.face.ImageOperate;
 import cn.veasion.util.face.ImageTextBean;
+import net.sf.json.JSONObject;
 
 /**
  * 截图JDialog窗体,程序主要框架，用于显示Robot截取屏幕图片显示<br>
@@ -324,12 +329,28 @@ public class Printscreen extends JDialog {
 		final Image imgTemp=img;
 		Thread t=new Thread(()->{
 			try{
-				ImageOperate imgOpe=new ImageOperate(StaticValue.faceApiKey, StaticValue.faceApiSecret);
 				Tools.clipboard.setContents(new StringSelection("正在识别.."), null);
-				ImageTextBean textBean=imgOpe.textRecognition(imgTemp);
-				String text=textBean.getTextStr();
+				String text=null;
+				if(StaticValue.ocrEngine==1){
+					if(VeaUtil.isNullEmpty(StaticValue.baiduAppId)){
+						Tools.clipboard.setContents(new StringSelection("您没有权限访问阿里云OCR，请与管理员联系（QQ：1456065030）"), null);
+					}else{
+						AipOcr client = new AipOcr(StaticValue.baiduAppId, StaticValue.baiduApiKey, StaticValue.baiduSecretKey);
+						// 可选：设置网络连接参数
+						client.setConnectionTimeoutInMillis(5000);
+						client.setSocketTimeoutInMillis(100000);
+						byte data[]=ImageUtil.imageToBytes(imgTemp, null);
+						TextResponseForBd response=new TextResponseForBd(JSONObject.fromObject(client.general(data, new HashMap<String, String>()).toString()));
+						text=response.getTextStr();
+					}
+				}else{
+					ImageOperate imgOpe=new ImageOperate(StaticValue.faceApiKey, StaticValue.faceApiSecret);
+					ImageTextBean textBean=imgOpe.textRecognition(imgTemp);
+					text=textBean.getTextStr();
+				}
 				Tools.clipboard.setContents(new StringSelection(text), null);
 			}catch(Exception e){
+				Tools.clipboard.setContents(new StringSelection("发生错误："+e.getMessage()), null);
 				e.printStackTrace();
 			}
 		});

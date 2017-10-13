@@ -9,9 +9,7 @@ public class FaceResponse {
     private int status;//返回的状态码 status code
 
 
-    public FaceResponse(){
-
-    }
+    public FaceResponse(){ }
 
     public FaceResponse(byte[] content, int status){
         this.content = content;
