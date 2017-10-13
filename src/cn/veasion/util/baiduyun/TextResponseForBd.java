@@ -38,16 +38,16 @@ public class TextResponseForBd {
 			}
 			// 文字识别，排序
 			textValues.sort((t1, t2)->{
-				double maxFontHeight = this.maxFontHeight();
+				double fh = this.maxFontHeight() / 2;
 				if (t1.getY() > t2.getY()) {
-					if (jdz(t1.getY() - t2.getY()) < maxFontHeight)
+					if (jdz(t1.getY() - t2.getY()) < fh)
 						return sortX(t1, t2);
 					else
 						return 1;
 				} else if (t1.getY() == t2.getY()) {
 					return sortX(t1, t2);
 				} else {
-					if (jdz(t1.getY() - t2.getY()) < maxFontHeight)
+					if (jdz(t1.getY() - t2.getY()) < fh)
 						return sortX(t1, t2);
 					else
 						return -1;

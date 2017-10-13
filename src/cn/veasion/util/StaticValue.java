@@ -14,6 +14,11 @@ import com.melloware.jintellitype.JIntellitype;
 public class StaticValue {
 
 	/**
+	 * Name 
+	 */
+	public static final String name="伟神";
+	
+	/**
 	 * 快捷键 
 	 */
 	public static int printKey1=JIntellitype.MOD_CONTROL;

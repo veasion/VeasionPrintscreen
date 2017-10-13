@@ -297,8 +297,8 @@ public class Rect {
 		GridLayout grid=new GridLayout(1, 0);
 		menu.setLayout(grid);
 		Font f=new Font("华文楷体", 1, 15);
-		JLabel label=new JLabel("伟神", JLabel.CENTER);
-		label.setToolTipText("伟神题库录入截图工具 --Veasion");
+		JLabel label=new JLabel(StaticValue.name, JLabel.CENTER);
+		label.setToolTipText(StaticValue.name+"题库录入截图工具 --Veasion");
 		label.setForeground(new Color(237, 100, 20));
 		label.setFont(f);
 		JButton exit=new JButton("退出");

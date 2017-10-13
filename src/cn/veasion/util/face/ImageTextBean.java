@@ -93,16 +93,16 @@ public class ImageTextBean {
 		
 		// 文字识别，排序
 		textList.sort((t1, t2)->{
-			int maxFontHeight = this.maxFontHeight();
+			int fh = this.maxFontHeight() / 2;
 			if (t1.getY() > t2.getY()) {
-				if (jdz(t1.getY() - t2.getY()) < maxFontHeight)
+				if (jdz(t1.getY() - t2.getY()) < fh)
 					return sortX(t1, t2);
 				else
 					return 1;
 			} else if (t1.getY() == t2.getY()) {
 				return sortX(t1, t2);
 			} else {
-				if (jdz(t1.getY() - t2.getY()) < maxFontHeight)
+				if (jdz(t1.getY() - t2.getY()) < fh)
 					return sortX(t1, t2);
 				else
 					return -1;

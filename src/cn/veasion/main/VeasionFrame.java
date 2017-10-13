@@ -33,7 +33,7 @@ public class VeasionFrame extends JFrame{
 	
 	public VeasionFrame(){
 		this.setLayout(new GridLayout(0, 2));
-		this.setTitle("伟神截图工具 --Veasion");
+		this.setTitle(StaticValue.name+"截图工具 --Veasion");
 		this.setLocationRelativeTo(null);
 		this.add(new JLabel("文字识别引擎："));
 		JComboBox<String> cbx=new JComboBox<>(new String[]{"Face++", "百度云"});
