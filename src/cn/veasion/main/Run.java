@@ -23,4 +23,5 @@ public class Run {
 		//最小化
 		frame.setExtendedState(JFrame.ICONIFIED);
 	}
+	
 }

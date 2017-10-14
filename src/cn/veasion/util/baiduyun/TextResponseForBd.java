@@ -14,6 +14,7 @@ public class TextResponseForBd {
 	private int resultCount;
 	
 	public TextResponseForBd(JSONObject json) {
+		System.out.println(json.toString(2));
 		this.json=json;
 		this.logId=json.optString("log_id");
 		this.resultCount=json.optInt("words_result_num", 0);

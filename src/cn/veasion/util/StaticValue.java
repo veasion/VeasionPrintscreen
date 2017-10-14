@@ -35,6 +35,11 @@ public class StaticValue {
 	public static Color deviceBgColor=Color.white;
 	
 	/**
+	 * 图片旋转统计范围 
+	 */
+	public static int rangeValue=3;
+	
+	/**
 	 * 文字识别模式，0 前台，1 后台
 	 */
 	public static int ocrModel = 1;
