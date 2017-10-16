@@ -64,6 +64,8 @@ public class Printscreen extends JDialog {
 	
 	private JFileChooser jc;
 	
+	public boolean over=false;
+	
 	static {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -258,13 +260,13 @@ public class Printscreen extends JDialog {
 		}else{
 			return images;
 		}*/
-		sr.over();
+		this.over();
 		BufferedImage image=new BufferedImage(Tools.SCREEN_WIDTH, Tools.SCREEN_HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
 		// 获取截图操作过图片
 		this.getContentPane().paint(image.getGraphics());
 		// 获取正在操作的图片
-		image=image.getSubimage(re.x, re.y, re.width, re.height);
-		sr.setOver(false);
+		image = image.getSubimage(re.x, re.y, re.width, re.height);
+		this.over=false;
 		return image;
 	}
 	
@@ -394,4 +396,8 @@ public class Printscreen extends JDialog {
 		sr=new SelectRect(this, r);
 	}
 	
+	public void over(){
+		this.over=true;
+		this.repaint();
+	}
 }

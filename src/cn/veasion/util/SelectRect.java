@@ -38,8 +38,6 @@ public class SelectRect {
 	private Rectangle moveStart;
 	private Rectangle moveRectangle;
 	
-	private boolean over=false;
-	
 	public SelectRect(Printscreen ps, Rect r){
 		this.ps=ps;
 		this.r=r;
@@ -49,7 +47,7 @@ public class SelectRect {
 		for (Operation operation : operations) {
 			operation.draw(g);
 		}
-		if(!over){
+		if(!ps.over){
 			g.setColor(Color.red);
 			this.current=new Rectangle(leftUpX, leftUpY, rightDownX-leftUpX, rightDownY-leftUpY);
 			g.drawRect(leftUpX, leftUpY, rightDownX-leftUpX, rightDownY-leftUpY);
@@ -111,14 +109,14 @@ public class SelectRect {
 				//结束移动
 				move = false;
 				ps.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-				this.over();
+				ps.over();
 				BufferedImage image=new BufferedImage(Tools.SCREEN_WIDTH, Tools.SCREEN_HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
 				// 获取截图操作过图片
 				ps.getContentPane().paint(image.getGraphics());
 				// 获取正在操作的图片
 				image=image.getSubimage(moveStart.x, moveStart.y, moveStart.width, moveStart.height);
 				operations.add(new Operation(new Rectangle(moveStart), new Rectangle(current), image));
-				this.over=false;
+				ps.over=false;
 				ps.repaint();// 重绘
 			}
 		}
@@ -133,15 +131,6 @@ public class SelectRect {
 				ps.repaint();
 			}
 		}
-	}
-	
-	public void over(){
-		this.over=true;
-		ps.repaint();
-	}
-	
-	public void setOver(boolean over){
-		this.over=over;
 	}
 	
 	private void setSize(){

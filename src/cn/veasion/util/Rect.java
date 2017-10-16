@@ -82,26 +82,27 @@ public class Rect {
 		width  = rightDownX - leftUpX;
 		height = rightDownY - leftUpY;
 		
-		g.drawRect(leftUpX, leftUpY, width, height);// 绘制矩形选区
-
-		//计算一些通用的值，避免重复计算，提高执行效率。
-		lxd = leftUpX - 2;// 左x点
-		uyd = leftUpY - 2;// 上y点
-		rxd = rightDownX - 2;// 右x点
-		dyd = rightDownY - 2;// 下y点
-		cxd = (leftUpX+rightDownX-1)>>1;// 中x点
-		cyd = (leftUpY+rightDownY-1)>>1;// 中y点
+		if(!ps.over){
+			g.drawRect(leftUpX, leftUpY, width, height);// 绘制矩形选区
+			//计算一些通用的值，避免重复计算，提高执行效率。
+			lxd = leftUpX - 2;// 左x点
+			uyd = leftUpY - 2;// 上y点
+			rxd = rightDownX - 2;// 右x点
+			dyd = rightDownY - 2;// 下y点
+			cxd = (leftUpX+rightDownX-1)>>1;// 中x点
+			cyd = (leftUpY+rightDownY-1)>>1;// 中y点
+			
+			// 绘制各个方向的可移动点
+			g.fillRect(lxd, uyd, dot, dot);// left-up
+			g.fillRect(lxd, dyd, dot, dot);// left-down
+			g.fillRect(rxd, uyd, dot, dot);// right-up
+			g.fillRect(rxd, dyd, dot, dot);// right-down
+			g.fillRect(lxd, cyd, dot, dot);// left
+			g.fillRect(rxd, cyd, dot, dot);// right
+			g.fillRect(cxd, uyd, dot, dot);// up
+			g.fillRect(cxd, dyd, dot, dot);// down
+		}
 		
-		// 绘制各个方向的可移动点
-		g.fillRect(lxd, uyd, dot, dot);// left-up
-		g.fillRect(lxd, dyd, dot, dot);// left-down
-		g.fillRect(rxd, uyd, dot, dot);// right-up
-		g.fillRect(rxd, dyd, dot, dot);// right-down
-		g.fillRect(lxd, cyd, dot, dot);// left
-		g.fillRect(rxd, cyd, dot, dot);// right
-		g.fillRect(cxd, uyd, dot, dot);// up
-		g.fillRect(cxd, dyd, dot, dot);// down
-
 		//绘制灰色透明区域
 		Graphics2D g2d = (Graphics2D) g;
 		g.setColor(Color.BLACK);
