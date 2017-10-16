@@ -1,14 +1,17 @@
 package cn.veasion.util;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.veasion.main.Printscreen;
+import cn.veasion.tools.Tools;
 
 /**
  * 选中小矩形
@@ -20,16 +23,22 @@ public class SelectRect {
 	private Printscreen ps;
 	private Rect r;
 
-	private boolean xuanDingMove=true;
+	private boolean xuanDingMove=false;
+	private boolean move=false;
 	private int mouseKeyCode;
 	
-	private Rectangle temp;
-	private List<Rectangle> rectangles=new ArrayList<>();
+	private Rectangle current;
+	private List<Operation> operations=new ArrayList<>();
 	
 	private int leftUpX;
 	private int leftUpY;
 	private int rightDownX;
 	private int rightDownY;
+	
+	private Rectangle moveStart;
+	private Rectangle moveRectangle;
+	
+	private boolean over=false;
 	
 	public SelectRect(Printscreen ps, Rect r){
 		this.ps=ps;
@@ -37,30 +46,38 @@ public class SelectRect {
 	}
 	
 	public void drawRect(Graphics g) {
-		for (Rectangle re : rectangles) {
-			g.setColor(StaticValue.deviceBgColor);
-			g.fillRect((int)re.getX(), (int)re.getY(), (int)re.getWidth(), (int)re.getHeight());
+		for (Operation operation : operations) {
+			operation.draw(g);
 		}
-		g.setColor(Color.red);
-		this.temp=this.getRect();
-		g.drawRect(leftUpX, leftUpY, rightDownX-leftUpX, rightDownY-leftUpY);
+		if(!over){
+			g.setColor(Color.red);
+			this.current=new Rectangle(leftUpX, leftUpY, rightDownX-leftUpX, rightDownY-leftUpY);
+			g.drawRect(leftUpX, leftUpY, rightDownX-leftUpX, rightDownY-leftUpY);
+		}
 	}
 	
 	public Rectangle getRect() {
-		return new Rectangle(leftUpX, leftUpY, rightDownX-leftUpX, rightDownY-leftUpY);
+		return this.current==null ? new Rectangle(leftUpX, leftUpY, rightDownX-leftUpX, rightDownY-leftUpY) : this.current;
 	}
 	
-	public List<Rectangle> getRectangles(){
-		return this.rectangles;
+	public List<Operation> getOperations(){
+		return this.operations;
 	}
 	
 	public void mousePressed(MouseEvent e) {
 		mouseKeyCode = e.getButton();
 		if(mouseKeyCode == 3){//右键
-			if(xuanDingMove){//选定开始
+			if(!xuanDingMove){//选定开始
+				xuanDingMove=true;
 				leftUpX = e.getX();
 				leftUpY = e.getY();
 				this.setSize();
+			}
+		}else if(mouseKeyCode == 1){//左键
+			if(!move && current!=null){
+				moveStart=new Rectangle(current);
+				moveRectangle=new Rectangle(e.getX(), e.getY(), e.getX()-current.x, e.getY()-current.y);
+				move=true;
 			}
 		}
 	}
@@ -72,14 +89,37 @@ public class SelectRect {
 				rightDownY=e.getY();
 				this.setSize();
 			}
+		}else if(mouseKeyCode == 1){//左键
+			if(move){
+				leftUpX=e.getX()-moveRectangle.width;
+				leftUpY=e.getY()-moveRectangle.height;
+				rightDownX=leftUpX+current.width;
+				rightDownY=leftUpY+current.height;
+				ps.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+			}
 		}
 	}
 	
 	public void mouseReleased(MouseEvent e) {
 		if(mouseKeyCode == 3){//右键
 			if(xuanDingMove){
-				//结束选
-				xuanDingMove = !xuanDingMove;
+				//结束选定
+				xuanDingMove = false;
+			}
+		}else if(mouseKeyCode == 1){//左键
+			if(move){
+				//结束移动
+				move = false;
+				ps.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+				this.over();
+				BufferedImage image=new BufferedImage(Tools.SCREEN_WIDTH, Tools.SCREEN_HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
+				// 获取截图操作过图片
+				ps.getContentPane().paint(image.getGraphics());
+				// 获取正在操作的图片
+				image=image.getSubimage(moveStart.x, moveStart.y, moveStart.width, moveStart.height);
+				operations.add(new Operation(new Rectangle(moveStart), new Rectangle(current), image));
+				this.over=false;
+				ps.repaint();// 重绘
 			}
 		}
 	}
@@ -87,35 +127,44 @@ public class SelectRect {
 	public void keyReleased(KeyEvent e){
 		if(e.getKeyCode() == 32){// 空格
 			// 清空矩形
-			if (temp != null && temp.getWidth() > 0 && temp.getHeight() > 0) {
-				rectangles.add(new Rectangle(temp));
+			if (current != null && current.width > 0 && current.height > 0) {
+				operations.add(new Operation(new Rectangle(current)));
 				// 重绘，这里不进行局部绘制
 				ps.repaint();
 			}
 		}
 	}
 	
+	public void over(){
+		this.over=true;
+		ps.repaint();
+	}
+	
+	public void setOver(boolean over){
+		this.over=over;
+	}
+	
 	private void setSize(){
 		Rectangle re=r.getRect();
-		if (leftUpX > re.getX() + re.getWidth()) {
-			leftUpX = (int) (re.getX() + re.getWidth());
-		} else if (leftUpX < re.getX()) {
-			leftUpX = (int) re.getX();
+		if (leftUpX > re.x + re.width) {
+			leftUpX = re.x + re.width;
+		} else if (leftUpX < re.x) {
+			leftUpX = re.x;
 		}
-		if (rightDownX > re.getX() + re.getWidth()) {
-			rightDownX = (int) (re.getX() + re.getWidth());
-		} else if (rightDownX < re.getX()) {
-			rightDownX = (int) re.getX();
+		if (rightDownX > re.x + re.width) {
+			rightDownX = re.x + re.width;
+		} else if (rightDownX < re.x) {
+			rightDownX = re.x;
 		}
-		if (leftUpY > re.getY() + re.getHeight()) {
-			leftUpY = (int) (re.getY() + re.getHeight());
-		} else if (leftUpY < re.getY()) {
-			leftUpY = (int) re.getY();
+		if (leftUpY > re.y + re.height) {
+			leftUpY = re.y + re.height;
+		} else if (leftUpY < re.y) {
+			leftUpY = re.y;
 		}
-		if (rightDownY > re.getY() + re.getHeight()) {
-			rightDownY = (int) (re.getY() + re.getHeight());
-		} else if (rightDownY < re.getY()) {
-			rightDownY = (int) re.getY();
+		if (rightDownY > re.y + re.height) {
+			rightDownY = re.y + re.height;
+		} else if (rightDownY < re.y) {
+			rightDownY = re.y;
 		}
 		if(leftUpX > rightDownX) rightDownX = leftUpX + 1;
 		if(leftUpY > rightDownY) rightDownY = leftUpY + 1;

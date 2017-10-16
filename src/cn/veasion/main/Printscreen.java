@@ -29,6 +29,7 @@ import cn.veasion.tools.FileFilter;
 import cn.veasion.tools.MouseTransferable;
 import cn.veasion.tools.Tools;
 import cn.veasion.util.ImageUtil;
+import cn.veasion.util.Operation;
 import cn.veasion.util.Rect;
 import cn.veasion.util.SelectRect;
 import cn.veasion.util.StaticValue;
@@ -54,7 +55,7 @@ public class Printscreen extends JDialog {
 
 	// 截图缓存对象
 	private BufferedImage imageCache;
-
+	
 	// 截图矩形框
 	private Rect r = new Rect(this);
 
@@ -103,9 +104,13 @@ public class Printscreen extends JDialog {
 
 		this.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				r.mousePressed(e);// 传递事件给选区
-				if(r.menu != null){
+				if(r.menu != null && sr.getRect().contains(e.getX(), e.getY())){
 					sr.mousePressed(e);
+				}else{
+					r.mousePressed(e);
+					if(r.menu != null){
+						sr.mousePressed(e);
+					}
 				}
 				if (e.getClickCount() == 2) {
 					copyInShearPlate();// 复制到剪切板
@@ -114,7 +119,7 @@ public class Printscreen extends JDialog {
 			public void mouseReleased(MouseEvent e) {// 鼠标按键弹起
 				r.mouseReleased(e);
 				if(r.menu != null){
-					sr.mousePressed(e);
+					sr.mouseReleased(e);
 				}
 			}
 		});
@@ -139,8 +144,8 @@ public class Printscreen extends JDialog {
 				} else if(e.getKeyCode() == 10){// 回车
 					copyInShearPlate();
 				} else if(e.getKeyCode() == 90){// Z 撤销
-					if(!VeaUtil.isNullEmpty(sr.getRectangles())){
-						sr.getRectangles().remove(sr.getRectangles().size()-1);
+					if(!VeaUtil.isNullEmpty(sr.getOperations())){
+						sr.getOperations().remove(sr.getOperations().size()-1);
 						repaint();
 					}
 				} else if(e.getKeyCode() == 107){// +
@@ -239,20 +244,28 @@ public class Printscreen extends JDialog {
 	 */
 	public Image getScreenImage() {
 		Rectangle re = r.getRect();
-		BufferedImage images=imageCache.getSubimage(re.x, re.y, re.width, re.height);
-		if(!VeaUtil.isNullEmpty(sr.getRectangles())){
+		/*BufferedImage images=imageCache.getSubimage(re.x, re.y, re.width, re.height);
+		if(!VeaUtil.isNullEmpty(sr.getOperations())){
 			// 清除操作
 			BufferedImage buff=new BufferedImage(re.width, re.height, BufferedImage.TYPE_INT_RGB);
 			Graphics g=buff.getGraphics();
 			g.drawImage(images, 0, 0, null);
 			g.setColor(StaticValue.deviceBgColor);
-			for (Rectangle rec : sr.getRectangles()) {
-				g.fillRect((int)(rec.getX()-re.getX()), (int)(rec.getY()-re.getY()), (int)rec.getWidth(), (int)rec.getHeight());
+			for (Operation operation : sr.getOperations()) {
+				operation.draw(g);
 			}
 			return buff;
 		}else{
 			return images;
-		}
+		}*/
+		sr.over();
+		BufferedImage image=new BufferedImage(Tools.SCREEN_WIDTH, Tools.SCREEN_HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
+		// 获取截图操作过图片
+		this.getContentPane().paint(image.getGraphics());
+		// 获取正在操作的图片
+		image=image.getSubimage(re.x, re.y, re.width, re.height);
+		sr.setOver(false);
+		return image;
 	}
 	
 	/**
