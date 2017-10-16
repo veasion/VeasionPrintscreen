@@ -6,6 +6,11 @@ import cn.veasion.util.VeaUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+/**
+ * 百度云文字识别文字排序
+ * 
+ * @author zhuowei.luo
+ */
 public class TextResponseForBd {
 	
 	private List<TextValueForBd> textValues=new ArrayList<>();
@@ -14,7 +19,7 @@ public class TextResponseForBd {
 	private int resultCount;
 	
 	public TextResponseForBd(JSONObject json) {
-		System.out.println(json.toString(2));
+		//System.out.println(json.toString(2));
 		this.json=json;
 		this.logId=json.optString("log_id");
 		this.resultCount=json.optInt("words_result_num", 0);
@@ -41,14 +46,14 @@ public class TextResponseForBd {
 			textValues.sort((t1, t2)->{
 				double fh = this.maxFontHeight() / 2;
 				if (t1.getY() > t2.getY()) {
-					if (jdz(t1.getY() - t2.getY()) < fh)
+					if (Math.abs(t1.getY() - t2.getY()) < fh)
 						return sortX(t1, t2);
 					else
 						return 1;
 				} else if (t1.getY() == t2.getY()) {
 					return sortX(t1, t2);
 				} else {
-					if (jdz(t1.getY() - t2.getY()) < fh)
+					if (Math.abs(t1.getY() - t2.getY()) < fh)
 						return sortX(t1, t2);
 					else
 						return -1;
@@ -65,19 +70,6 @@ public class TextResponseForBd {
 			return 1;
 		else
 			return -1;
-	}
-	
-	// 绝对值
-	private double jdz(double xxx){
-		if (xxx < 0)
-			return -xxx;
-		else
-			return xxx;
-	}
-	
-	// 最大
-	private double max(double x, double y){
-		return x > y ? x : y;
 	}
 	
 	/**

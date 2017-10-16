@@ -95,14 +95,14 @@ public class ImageTextBean {
 		textList.sort((t1, t2)->{
 			int fh = this.maxFontHeight() / 2;
 			if (t1.getY() > t2.getY()) {
-				if (jdz(t1.getY() - t2.getY()) < fh)
+				if (Math.abs(t1.getY() - t2.getY()) < fh)
 					return sortX(t1, t2);
 				else
 					return 1;
 			} else if (t1.getY() == t2.getY()) {
 				return sortX(t1, t2);
 			} else {
-				if (jdz(t1.getY() - t2.getY()) < fh)
+				if (Math.abs(t1.getY() - t2.getY()) < fh)
 					return sortX(t1, t2);
 				else
 					return -1;
@@ -118,19 +118,6 @@ public class ImageTextBean {
 			return 1;
 		else
 			return -1;
-	}
-	
-	// 绝对值
-	private int jdz(int xxx){
-		if (xxx < 0)
-			return -xxx;
-		else
-			return xxx;
-	}
-	
-	// 最大
-	private int max(int x, int y){
-		return x > y ? x : y;
 	}
 	
 	public int getStatus() {
