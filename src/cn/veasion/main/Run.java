@@ -6,6 +6,11 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+/**
+ * 运行程序Main方法.
+ * 
+ * @author zhuowei.luo
+ */
 public class Run {
 
 	public static void main(String[] args) {

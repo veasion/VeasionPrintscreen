@@ -5,6 +5,11 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * hough算法
+ * 
+ * @author zhuowei.luo
+ */
 public class HoughUtils {
 
 	public BufferedImage performFarbaenderungsErkennungRGB(BufferedImage sprite) {

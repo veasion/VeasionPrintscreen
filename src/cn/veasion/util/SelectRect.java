@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-
 import cn.veasion.main.Printscreen;
 import cn.veasion.tools.Tools;
 

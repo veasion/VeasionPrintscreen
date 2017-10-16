@@ -29,7 +29,6 @@ import cn.veasion.tools.FileFilter;
 import cn.veasion.tools.MouseTransferable;
 import cn.veasion.tools.Tools;
 import cn.veasion.util.ImageUtil;
-import cn.veasion.util.Operation;
 import cn.veasion.util.Rect;
 import cn.veasion.util.SelectRect;
 import cn.veasion.util.StaticValue;

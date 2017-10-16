@@ -4,6 +4,11 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
+/**
+ * 截图操作记录.
+ * 
+ * @author zhuowei.luo
+ */
 public class Operation {
 	
 	private Rectangle src;
