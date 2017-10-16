@@ -38,6 +38,9 @@ public class Rect {
 	private int width;// 宽度
 	private int height;// 高度
 
+	private int menuWidth=560;
+	private int menuHeight=30;
+			
 	private int dot = 5;// 移动线条节点
 
 	// 绘制各个方向的可移动点
@@ -261,13 +264,13 @@ public class Rect {
 				ps.setCursor(D);//设置鼠标默认状态
 			}
 			// 显示功能菜单
-			if (leftUpX + 560 > screenWidth && leftUpY+height + 31 < screenHeight) {
-				showMouseMenu(new Rectangle(screenWidth-562, leftUpY+height+10, 560, 30));
-			}else if (leftUpY+height + 31 > screenHeight && leftUpX + 560 < screenWidth) {
-				showMouseMenu(new Rectangle(leftUpX, leftUpY-40, 560, 30));
-			}else if(leftUpX + 560 > screenWidth){
-				showMouseMenu(new Rectangle(screenWidth-562, leftUpY-40, 560, 30));
-			}else{
+			if (leftUpX + width - menuWidth < 0 && leftUpY + height + menuHeight + 1 < screenHeight) {
+				showMouseMenu(new Rectangle(0, leftUpY + height + 10, menuWidth, menuHeight));
+			} else if (leftUpX + width - menuWidth < 0 && leftUpY + height + menuHeight + 1 > screenHeight) {
+				showMouseMenu(new Rectangle(0, leftUpY - (menuHeight + 10), menuWidth, menuHeight));
+			} else if (leftUpY + height + menuHeight + 1 > screenHeight) {
+				showMouseMenu(new Rectangle(leftUpX + width - menuWidth, leftUpY - (menuHeight + 10), menuWidth, menuHeight));
+			} else {
 				showMouseMenu(null);
 			}
 		}
@@ -283,7 +286,7 @@ public class Rect {
 		if(r!=null){
 			menu.setBounds(r);
 		}else{
-			menu.setBounds(leftUpX, leftUpY + height + 10, 560, 30);
+			menu.setBounds(leftUpX+width-menuWidth, leftUpY + height + 10, menuWidth, menuHeight);
 		}
 		// 清空选中矩形
 		ps.clearSelectRect();
@@ -301,13 +304,20 @@ public class Rect {
 		label.setToolTipText(StaticValue.name+"题库录入截图工具 --Veasion");
 		label.setForeground(new Color(237, 100, 20));
 		label.setFont(f);
-		JButton exit=new JButton("退出");
-		JButton save=new JButton("保存");
+		JButton exit=new JButton("取消");
+		exit.setToolTipText("退出截图（Esc）..");
+		JButton save=new JButton("另存为");
+		save.setToolTipText("另存为文件");
 		JButton fill=new JButton("适应设备");
 		fill.setToolTipText("截图自适应设备（620~460）");
 		JButton ocr=new JButton("文字识别");
+		ocr.setToolTipText("进行OCR文字识别，Ctrl+V 可粘贴识别结果");
 		JButton complete=new JButton("完成");
+		complete.setToolTipText("完成截图，Ctrl+V 可粘贴");
 		JButton mspaint=new JButton("画图");
+		mspaint.setToolTipText("打开画图进行编辑");
+		JButton hough=new JButton("矫正");
+		hough.setToolTipText("图片矫正");
 		
 		complete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -339,13 +349,19 @@ public class Rect {
 				ps.mspaintImage();
 			}
 		});
+		hough.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ps.houghImage();
+			}
+		});
 		menu.add(label);
-		menu.add(complete);
-		menu.add(ocr);
-		menu.add(fill);
-		menu.add(mspaint);
 		menu.add(save);
+		// menu.add(hough);
+		menu.add(mspaint);
+		menu.add(fill);
+		menu.add(ocr);
 		menu.add(exit);
+		menu.add(complete);
 	}
 	
 }

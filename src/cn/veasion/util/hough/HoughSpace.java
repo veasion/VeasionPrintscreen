@@ -31,7 +31,7 @@ public class HoughSpace {
 				}
 			}
 		}
-		System.out.println("maxValue: " + maxValue);
+		// System.out.println("maxValue: " + maxValue);
 	}
 
 	/**

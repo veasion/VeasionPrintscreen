@@ -31,6 +31,9 @@ public class Gerade {
 		this.y2=yEnd + height / 2;
 		int x=Math.abs(x2-x1), y=Math.abs(y2-y1);
 		angle=Math.acos(x/(Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))))*180/Math.PI;
+		if (y1 > y2) {
+			angle = -angle;
+		}
 	}
 
 	public void draw(Graphics g) {

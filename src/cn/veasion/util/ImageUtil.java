@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -66,34 +67,38 @@ public class ImageUtil {
     	return new BASE64Encoder().encode(ImageUtil.imageToBytes(image, null));
     }
     
-    /**
+	/**
      * 图片旋转 
      * 
      * @param src 原图片
      * @param angel 角度
      * @see 缺点：失真比较大
      */
-	public static BufferedImage Rotate(Image src, int angel) {
-		int src_width = src.getWidth(null);
-		int src_height = src.getHeight(null);
+	public static BufferedImage rotate(final BufferedImage src, final double angel) {
+		int src_width = src.getWidth();
+		int src_height = src.getHeight();
 		// 重新计算图片旋转大小
-		Rectangle rect_des = CalcRotatedSize(new Rectangle(new Dimension(src_width, src_height)), angel);
+		Rectangle rect_des = calcRotatedSize(new Rectangle(new Dimension(src_width, src_height)), angel);
 
 		BufferedImage res = null;
 		res = new BufferedImage(rect_des.width, rect_des.height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2 = res.createGraphics();
+		g2.setColor(StaticValue.deviceBgColor);
+		g2.fillRect(0, 0, rect_des.width, rect_des.height);
 		// 旋转
 		g2.translate((rect_des.width - src_width) / 2, (rect_des.height - src_height) / 2);
 		g2.rotate(Math.toRadians(angel), src_width / 2, src_height / 2);
-
+		
 		g2.drawImage(src, null, null);
+		g2.dispose();
 		return res;
 	}
 	
 	/**
 	 * 计算矩形旋转后的大小
 	 */
-	public static Rectangle CalcRotatedSize(Rectangle src, int angel) {
+	public static Rectangle calcRotatedSize(Rectangle src, double angel) {
+		angel=Math.abs(angel);
 		if (angel >= 90) {
 			if (angel / 90 % 2 == 1) {
 				int temp = src.height;
@@ -135,14 +140,14 @@ public class ImageUtil {
 	 */
 	public static BufferedImage imageHough(BufferedImage source){
 		List<Gerade> angles=new Hough(source).lineRange();
-		double angel=0;
 		double avg=HoughUtils.avgAngle(angles);
-		double range=HoughUtils.avgRangeAngle(angles, StaticValue.rangeValue);
-		if(Math.round(avg-range)>StaticValue.rangeValue*2){
-			angel=avg;
+		double angel=HoughUtils.avgRangeAngle(angles, StaticValue.rangeValue);
+		if (Math.round(Math.abs(avg - angel)) > StaticValue.rangeValue * 2) {
+			angel = avg;
 		}
-		// TODO 失真太大，反向旋转
-		return Rotate(source, new Long(Math.round(360-angel)).intValue());
+		System.out.println("旋转角度："+(-angel));
+		// TODO 失真太大
+		return rotate(source, new Long(Math.round(-angel)).intValue());
 	}
 	
 }

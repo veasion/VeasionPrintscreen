@@ -6,12 +6,12 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class Test {
+public class HoughTest {
 
 	public static void main(String[] args) throws IOException {
 		String path="C:\\Users\\zhuowei.luo\\Desktop\\";
-		BufferedImage src = ImageIO.read(new File(path+"abcd1.png"));  
-        BufferedImage des = ImageUtil.Rotate(src, 50);
+		BufferedImage src = ImageIO.read(new File(path+"abc2.png")); 
+        BufferedImage des = ImageUtil.imageHough(src);
         ImageIO.write(des, "png", new File(path+"abcd2.png"));
 		
 	}

@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
@@ -28,6 +29,8 @@ public class VeasionFrame extends JFrame{
 	private static final long serialVersionUID = 1L;
 
 	private static final int PrintscreenKey = 1;
+	
+	private HotkeyListener hotkey;
 	
 	private Printscreen p=new Printscreen();
 	
@@ -62,9 +65,23 @@ public class VeasionFrame extends JFrame{
 		});
 		this.add(tf1);
 		this.add(new JLabel("截图快捷键："));
-		JTextField tf2=new JTextField(" Ctrl + B");
-		tf2.setEnabled(false);
-		this.add(tf2);
+		
+		JPanel jp=new JPanel(new GridLayout(1, 0));
+		JComboBox<String> cboKey=new JComboBox<>(new String[]{"Shift", "Ctrl", "Win", "Alt"});
+		cboKey.setSelectedIndex(indexModKeyIndex());
+		jp.add(cboKey);
+		jp.add(new JLabel("+", JLabel.CENTER));
+		JTextField jkey=new JTextField(String.valueOf((char)StaticValue.printKey2));
+		jkey.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (jkey.getText().length() > 0) {
+					jkey.setText(jkey.getText().toUpperCase().substring(0, 1));
+				}
+			}
+		});
+		jp.add(jkey);
+		this.add(jp);
 		this.add(new JLabel("自适应背景："));
 		JComboBox<String> cbx2=new JComboBox<>(new String[]{"白色", "黑色"});
 		cbx2.setSelectedIndex(StaticValue.deviceBgColor==Color.black ? 1 : 0);
@@ -79,9 +96,11 @@ public class VeasionFrame extends JFrame{
 		b1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				cboKey.setSelectedIndex(1);
 				cbx.setSelectedIndex(0);
 				cbx1.setSelectedIndex(1);
 				cbx2.setSelectedIndex(0);
+				jkey.setText("B");
 				tf1.setText("630");
 				b2.doClick();
 			}
@@ -89,34 +108,69 @@ public class VeasionFrame extends JFrame{
 		b2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				StaticValue.printKey1=new int[]{JIntellitype.MOD_SHIFT, JIntellitype.MOD_CONTROL, JIntellitype.MOD_WIN, JIntellitype.MOD_ALT}[cboKey.getSelectedIndex()];
+				if (jkey.getText().length() > 0) {
+					StaticValue.printKey2=(int)jkey.getText().toUpperCase().charAt(0);
+				}else{
+					jkey.setText("B");
+					StaticValue.printKey2=(int)jkey.getText().toUpperCase().charAt(0);
+				}
 				StaticValue.ocrEngine=cbx.getSelectedIndex();
 				StaticValue.ocrModel=cbx1.getSelectedIndex();
 				StaticValue.deviceBgColor = cbx2.getSelectedIndex() == 1 ? Color.black : Color.white;
 				StaticValue.deviceWidth=VeaUtil.valueOfInt(tf1.getText(), 630);
 				StaticValue.write();
+				registerHotKey(StaticValue.printKey1, StaticValue.printKey2);
 			}
 		});
 		this.add(b1);
 		this.add(b2);
 		
-		this.setSize(300, 200);
+		this.setSize(340, 200);
 		this.setResizable(false);
 		
+		registerHotKey(StaticValue.printKey1, StaticValue.printKey2);
+	}
+	
+	/**
+	 * 添加/重置 全局键盘监听钩子 
+	 */
+	private void registerHotKey(int key1, int key2){
 		// 添加全局键盘监听钩子
-		//第一步：注册热键，第一个参数表示该热键的标识，第二个参数表示组合键，如果没有则为0，第三个参数为定义的主要热键
-    	JIntellitype.getInstance().registerHotKey(PrintscreenKey, StaticValue.printKey1, StaticValue.printKey2);
+		if (hotkey != null) {
+			JIntellitype.getInstance().unregisterHotKey(PrintscreenKey);
+			JIntellitype.getInstance().removeHotKeyListener(hotkey);
+		}
+		
+		// 注册热键，第一个参数表示该热键的标识，第二个参数表示组合键，如果没有则为0，第三个参数为定义的主要热键
+    	JIntellitype.getInstance().registerHotKey(PrintscreenKey, key1, key2);
     	
-    	//第二步：添加热键监听器
-        JIntellitype.getInstance().addHotKeyListener(new HotkeyListener() {
+    	hotkey=new HotkeyListener() {
 			@Override
 			public void onHotKey(int markCode) {
 				if(PrintscreenKey == markCode){
 					p.start();
 				}
 			}
-		});
+		};
+		
+    	//第二步：添加热键监听器
+        JIntellitype.getInstance().addHotKeyListener(hotkey);
 	}
 	
-	
+	private int indexModKeyIndex() {
+		switch (StaticValue.printKey1) {
+			case JIntellitype.MOD_SHIFT:
+				return 0;
+			case JIntellitype.MOD_CONTROL:
+				return 1;
+			case JIntellitype.MOD_WIN:
+				return 2;
+			case JIntellitype.MOD_ALT:
+				return 3;
+			default:
+				return 1;
+		}
+	}
 	
 }

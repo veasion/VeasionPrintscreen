@@ -143,7 +143,8 @@ public class HoughUtils {
 		double start = angles.get(0).getAngle();
 		List<Double> range = new ArrayList<>();
 		ranges.add(range);
-		angles.sort((v1, v2)->v1.getAngle()>v2.getAngle() ? 1 : -1);
+		//System.out.println(angles);
+		angles.sort((v1, v2) -> v1.getAngle() == v2.getAngle() ? 0 : v1.getAngle() > v2.getAngle() ? 1 : -1);
 		for (Gerade angle : angles) {
 			if (angle.getAngle() > start + rangeValue) {
 				range = new ArrayList<>();

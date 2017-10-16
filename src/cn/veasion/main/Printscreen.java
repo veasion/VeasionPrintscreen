@@ -136,11 +136,15 @@ public class Printscreen extends JDialog {
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == 27) {// ESC键
 					finishAndinitialization();
-				}else if(e.getKeyCode() == 90){// Z 撤销
+				} else if(e.getKeyCode() == 10){// 回车
+					copyInShearPlate();
+				} else if(e.getKeyCode() == 90){// Z 撤销
 					if(!VeaUtil.isNullEmpty(sr.getRectangles())){
 						sr.getRectangles().remove(sr.getRectangles().size()-1);
 						repaint();
 					}
+				} else if(e.getKeyCode() == 107){// +
+					houghImage();
 				}
 				sr.keyReleased(e);
 			}
@@ -293,6 +297,14 @@ public class Printscreen extends JDialog {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * 图片矫正 
+	 */
+	public void houghImage(){
+		Tools.clipboard.setContents(new MouseTransferable(ImageUtil.imageHough((BufferedImage)getScreenImage())), null);
+		finishAndinitialization();
 	}
 	
 	/**
