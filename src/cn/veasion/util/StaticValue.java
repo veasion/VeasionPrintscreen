@@ -35,6 +35,11 @@ public class StaticValue {
 	public static Color deviceBgColor=Color.white;
 	
 	/**
+	 * 截图后是否固定
+	 */
+	public static boolean psFixed=false;
+	
+	/**
 	 * 图片旋转统计范围 
 	 */
 	public static int rangeValue=3;
@@ -70,6 +75,7 @@ public class StaticValue {
     	map.put("printKey2", printKey2);
     	map.put("deviceWidth", deviceWidth);
     	map.put("deviceBgColor", deviceBgColor==Color.black ? "黑色" : "白色");
+    	map.put("psFixed", psFixed);
     	map.put("ocrEngine", ocrEngine);
     	map.put("ocrModel", ocrModel);
     	map.put("faceApiKey", faceApiKey);
@@ -86,6 +92,7 @@ public class StaticValue {
     	printKey2=VeaUtil.valueOfInt(ConfigUtil.getProperty("printKey2", String.valueOf(printKey2)), printKey2);
     	deviceWidth=VeaUtil.valueOfInt(ConfigUtil.getProperty("deviceWidth", String.valueOf(deviceWidth)), deviceWidth);
     	deviceBgColor="黑色".equals(ConfigUtil.getProperty("deviceBgColor", "黑色")) ? Color.black : Color.white;
+    	psFixed=ConfigUtil.getPropertyBoolean("psFixed", false);
     	ocrEngine=VeaUtil.valueOfInt(ConfigUtil.getProperty("ocrEngine", String.valueOf(ocrEngine)), ocrEngine);
     	ocrModel=VeaUtil.valueOfInt(ConfigUtil.getProperty("ocrModel", String.valueOf(ocrModel)), ocrModel);
     	faceApiKey=ConfigUtil.getProperty("faceApiKey", faceApiKey);

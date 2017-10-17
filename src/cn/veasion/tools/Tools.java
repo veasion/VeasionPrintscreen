@@ -17,7 +17,7 @@ public class Tools {
 	//系统剪切板
 	public static Clipboard clipboard =  Toolkit.getDefaultToolkit().getSystemClipboard();
 	
-	public static final Rectangle SCREEN_RECTANGLE = new Rectangle(0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
+	public static final Rectangle SCREEN_RECTANGLE = new Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	
 	public static final Color RECT_COLOR = new Color(0, 174, 255);
 	

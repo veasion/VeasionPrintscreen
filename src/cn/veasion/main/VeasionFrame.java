@@ -6,11 +6,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
@@ -88,6 +91,14 @@ public class VeasionFrame extends JFrame{
 		JComboBox<String> cbx2=new JComboBox<>(new String[]{"白色", "黑色"});
 		cbx2.setSelectedIndex(StaticValue.deviceBgColor==Color.black ? 1 : 0);
 		this.add(cbx2);
+		this.add(new JLabel("截图操作后是否固定截图框："));
+		JPanel jp2=new JPanel(new GridLayout(1, 0));
+		JRadioButton r1=new JRadioButton("是", StaticValue.psFixed);
+		JRadioButton r2=new JRadioButton("否", !StaticValue.psFixed);
+		ButtonGroup bg=new ButtonGroup();
+		bg.add(r1);bg.add(r2);
+		jp2.add(r1);jp2.add(r2);
+		this.add(jp2);
 		this.add(new JLabel("配置文件："));
 		JTextField jtf=new JTextField(ConfigUtil.configPath);
 		jtf.setEnabled(false);
@@ -102,6 +113,7 @@ public class VeasionFrame extends JFrame{
 				cbx.setSelectedIndex(0);
 				cbx1.setSelectedIndex(1);
 				cbx2.setSelectedIndex(0);
+				r2.setSelected(true);
 				jkey.setText("B");
 				tf1.setText("630");
 				b2.doClick();
@@ -121,6 +133,7 @@ public class VeasionFrame extends JFrame{
 				StaticValue.ocrModel=cbx1.getSelectedIndex();
 				StaticValue.deviceBgColor = cbx2.getSelectedIndex() == 1 ? Color.black : Color.white;
 				StaticValue.deviceWidth=VeaUtil.valueOfInt(tf1.getText(), 630);
+				StaticValue.psFixed=r1.isSelected();
 				StaticValue.write();
 				registerHotKey(StaticValue.printKey1, StaticValue.printKey2);
 			}

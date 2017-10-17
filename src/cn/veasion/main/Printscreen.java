@@ -20,6 +20,7 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
@@ -90,6 +91,7 @@ public class Printscreen extends JDialog {
 						imageCache = new Robot().createScreenCapture(Tools.SCREEN_RECTANGLE);// 截取屏幕图片
 					} catch (AWTException e) {
 						System.out.println("Robot class create picture cache failed!");
+						e.printStackTrace();
 					}
 				}
 				// 绘制截图
@@ -102,14 +104,17 @@ public class Printscreen extends JDialog {
 				}
 			}
 		});
-
+		
 		this.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
+				int mouseKeyCode = e.getButton();
 				if(r.menu != null && sr.getRect().contains(e.getX(), e.getY())){
 					sr.mousePressed(e);
 				}else{
-					r.mousePressed(e);
-					if(r.menu != null){
+					if(!(StaticValue.psFixed && !VeaUtil.isNullEmpty(sr.getOperations()))){
+						r.mousePressed(e);
+					}
+					if(r.menu != null && mouseKeyCode==3){
 						sr.mousePressed(e);
 					}
 				}
@@ -127,14 +132,18 @@ public class Printscreen extends JDialog {
 
 		this.addMouseMotionListener(new MouseMotionListener() {
 			public void mouseDragged(MouseEvent e) {
-				r.mouseDragged(e);
+				if(!(StaticValue.psFixed && !VeaUtil.isNullEmpty(sr.getOperations()))){
+					r.mouseDragged(e);
+				}
 				if(r.menu != null){
 					sr.mouseDragged(e);
 				}
 				repaint();
 			}
 			public void mouseMoved(MouseEvent e) {
-				r.mouseMoved(e);// 矩形选区鼠标移动事件
+				if(!(StaticValue.psFixed && !VeaUtil.isNullEmpty(sr.getOperations()))){
+					r.mouseMoved(e);// 矩形选区鼠标移动事件
+				}
 			}
 		});
 
