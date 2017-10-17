@@ -52,14 +52,16 @@ public class VeasionFrame extends JFrame{
 			@Override
 			public void keyReleased(KeyEvent e) {
 				int k=e.getKeyCode();
-				if ((k >= 48 && k <= 57) || (k >= 96 && k <= 105) || k == 8) {
-					super.keyReleased(e);
-				} else {
-					tf1.setText(tf1.getText().replaceAll("\\D+", ""));
-				}
-				int v=VeaUtil.valueOfInt(tf1.getText(), 0);
-				if (v <= 0 || v > 5000) {
-					tf1.setText("630");
+				if (k != 8) {
+					if ((k >= 48 && k <= 57) || (k >= 96 && k <= 105) || k == 8) {
+						super.keyReleased(e);
+					} else {
+						tf1.setText(tf1.getText().replaceAll("\\D+", ""));
+					}
+					int v=VeaUtil.valueOfInt(tf1.getText(), 0);
+					if (v <= 0 || v > 5000) {
+						tf1.setText("630");
+					}
 				}
 			}
 		});
@@ -76,7 +78,7 @@ public class VeasionFrame extends JFrame{
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if (jkey.getText().length() > 0) {
-					jkey.setText(jkey.getText().toUpperCase().substring(0, 1));
+					jkey.setText(jkey.getText().toUpperCase().substring(jkey.getText().length()-1));
 				}
 			}
 		});
