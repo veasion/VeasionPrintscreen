@@ -63,7 +63,7 @@ public class Printscreen extends JDialog {
 	
 	private JFileChooser jc;
 	
-	public boolean over=false;
+	private boolean overDrawImage=false;
 	
 	static {
 		try {
@@ -245,27 +245,10 @@ public class Printscreen extends JDialog {
 	 */
 	public Image getScreenImage() {
 		Rectangle re = r.getRect();
-		/*BufferedImage images=imageCache.getSubimage(re.x, re.y, re.width, re.height);
-		if(!VeaUtil.isNullEmpty(sr.getOperations())){
-			// 清除操作
-			BufferedImage buff=new BufferedImage(re.width, re.height, BufferedImage.TYPE_INT_RGB);
-			Graphics g=buff.getGraphics();
-			g.drawImage(images, 0, 0, null);
-			g.setColor(StaticValue.deviceBgColor);
-			for (Operation operation : sr.getOperations()) {
-				operation.draw(g);
-			}
-			return buff;
-		}else{
-			return images;
-		}*/
-		this.over();
-		BufferedImage image=new BufferedImage(Tools.SCREEN_WIDTH, Tools.SCREEN_HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
 		// 获取截图操作过图片
-		this.getContentPane().paint(image.getGraphics());
+		BufferedImage image=this.getDrawImage();
 		// 获取正在操作的图片
 		image = image.getSubimage(re.x, re.y, re.width, re.height);
-		this.over=false;
 		return image;
 	}
 	
@@ -395,8 +378,21 @@ public class Printscreen extends JDialog {
 		sr=new SelectRect(this, r);
 	}
 	
-	public void over(){
-		this.over=true;
-		this.repaint();
+	/**
+	 * 获取绘画后的全屏截图 
+	 */
+	public BufferedImage getDrawImage(){
+		this.overDrawImage=true;
+		BufferedImage image=new BufferedImage(Tools.SCREEN_WIDTH, Tools.SCREEN_HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
+		// 获取截图操作过图片
+		this.getContentPane().paint(image.getGraphics());
+		this.overDrawImage=false;
+		// this.repaint();
+		return image;
 	}
+	
+	public boolean isOverDrawImage() {
+		return overDrawImage;
+	}
+	
 }

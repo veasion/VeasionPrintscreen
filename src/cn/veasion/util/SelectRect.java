@@ -3,6 +3,7 @@ package cn.veasion.util;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -10,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import cn.veasion.main.Printscreen;
-import cn.veasion.tools.Tools;
 
 /**
  * 选中小矩形
@@ -34,8 +34,11 @@ public class SelectRect {
 	private int rightDownX;
 	private int rightDownY;
 	
+	private Point start;
+	
 	private Rectangle moveStart;
 	private Rectangle moveRectangle;
+	private Operation moveOperation;
 	
 	public SelectRect(Printscreen ps, Rect r){
 		this.ps=ps;
@@ -46,7 +49,11 @@ public class SelectRect {
 		for (Operation operation : operations) {
 			operation.draw(g);
 		}
-		if(!ps.over){
+		if(!ps.isOverDrawImage()){
+			if(move && moveOperation!=null){
+				// 绘制图片移动过程
+				moveOperation.draw(g);
+			}
 			g.setColor(Color.red);
 			this.current=new Rectangle(leftUpX, leftUpY, rightDownX-leftUpX, rightDownY-leftUpY);
 			g.drawRect(leftUpX, leftUpY, rightDownX-leftUpX, rightDownY-leftUpY);
@@ -68,6 +75,9 @@ public class SelectRect {
 				xuanDingMove=true;
 				leftUpX = e.getX();
 				leftUpY = e.getY();
+				rightDownX=e.getX();
+				rightDownY=e.getY();
+				start=new Point(e.getX(), e.getY());
 				this.setSize();
 			}
 		}else if(mouseKeyCode == 1){//左键
@@ -93,6 +103,10 @@ public class SelectRect {
 				rightDownX=leftUpX+current.width;
 				rightDownY=leftUpY+current.height;
 				ps.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+				// 移动图片过程
+				BufferedImage image=ps.getDrawImage();
+				image=image.getSubimage(moveStart.x, moveStart.y, moveStart.width, moveStart.height);
+				moveOperation=new Operation(new Rectangle(moveStart), new Rectangle(current), image);
 			}
 		}
 	}
@@ -102,20 +116,17 @@ public class SelectRect {
 			if(xuanDingMove){
 				//结束选定
 				xuanDingMove = false;
+				start=null;
 			}
 		}else if(mouseKeyCode == 1){//左键
 			if(move){
 				//结束移动
 				move = false;
 				ps.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-				ps.over();
-				BufferedImage image=new BufferedImage(Tools.SCREEN_WIDTH, Tools.SCREEN_HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
-				// 获取截图操作过图片
-				ps.getContentPane().paint(image.getGraphics());
-				// 获取正在操作的图片
+				BufferedImage image=ps.getDrawImage();
 				image=image.getSubimage(moveStart.x, moveStart.y, moveStart.width, moveStart.height);
 				operations.add(new Operation(new Rectangle(moveStart), new Rectangle(current), image));
-				ps.over=false;
+				moveOperation=null;
 				ps.repaint();// 重绘
 			}
 		}
@@ -154,8 +165,20 @@ public class SelectRect {
 		} else if (rightDownY < re.y) {
 			rightDownY = re.y;
 		}
-		if(leftUpX > rightDownX) rightDownX = leftUpX + 1;
-		if(leftUpY > rightDownY) rightDownY = leftUpY + 1;
+		
+		// 上下左右都可以选拖
+		if(start.x > rightDownX && start.y > rightDownY){
+			leftUpX = rightDownX;
+			rightDownX = start.x;
+			leftUpY = rightDownY;
+			rightDownY = start.y;
+		}else if (start.x > rightDownX) {
+			leftUpX = rightDownX;
+			rightDownX = start.x;
+		}else if (start.y > rightDownY) {
+			leftUpY = rightDownY;
+			rightDownY = start.y;
+		}
 	}
 	
 }

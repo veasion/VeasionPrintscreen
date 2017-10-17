@@ -82,7 +82,7 @@ public class Rect {
 		width  = rightDownX - leftUpX;
 		height = rightDownY - leftUpY;
 		
-		if(!ps.over){
+		if(!ps.isOverDrawImage()){
 			g.drawRect(leftUpX, leftUpY, width, height);// 绘制矩形选区
 			//计算一些通用的值，避免重复计算，提高执行效率。
 			lxd = leftUpX - 2;// 左x点
