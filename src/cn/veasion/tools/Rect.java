@@ -1,4 +1,4 @@
-package cn.veasion.util;
+package cn.veasion.tools;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -6,18 +6,10 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import cn.veasion.main.Printscreen;
-import cn.veasion.tools.Direction;
-import cn.veasion.tools.Tools;
 
 /**
  * 绘制空心矩形和灰暗效果的对象
@@ -29,7 +21,7 @@ public class Rect {
 	private int screenWidth = Tools.SCREEN_WIDTH;// 屏幕的宽度
 	private int screenHeight = Tools.SCREEN_HEIGHT;// //屏幕的高度
 	private Printscreen ps;
-	public JPanel menu;
+	private MenuTool menu;
  
 	private int leftUpX;// 左上角x
 	private int leftUpY;// 左上角y
@@ -282,7 +274,7 @@ public class Rect {
 	 */
 	public void showMouseMenu(Rectangle r) {
 		if(menu==null){
-			initMenu();
+			menu=new MenuTool(ps, this);
 		}
 		if(r!=null){
 			menu.setBounds(r);
@@ -293,76 +285,14 @@ public class Rect {
 		ps.clearSelectRect();
 		ps.getLayeredPane().remove(menu);
 		ps.getLayeredPane().add(menu, new Integer(Integer.MAX_VALUE));
-		
 	}
 	
-	private void initMenu(){
-		menu=new JPanel();
-		GridLayout grid=new GridLayout(1, 0);
-		menu.setLayout(grid);
-		Font f=new Font("华文楷体", 1, 15);
-		JLabel label=new JLabel(StaticValue.name, JLabel.CENTER);
-		label.setToolTipText(StaticValue.name+"题库录入截图工具 --Veasion");
-		label.setForeground(new Color(237, 100, 20));
-		label.setFont(f);
-		JButton exit=new JButton("取消");
-		exit.setToolTipText("退出截图（Esc）..");
-		JButton save=new JButton("另存为");
-		save.setToolTipText("另存为文件");
-		JButton fill=new JButton("适应设备");
-		fill.setToolTipText("截图自适应设备（620~460）");
-		JButton ocr=new JButton("文字识别");
-		ocr.setToolTipText("进行OCR文字识别，Ctrl+V 可粘贴识别结果");
-		JButton complete=new JButton("完成");
-		complete.setToolTipText("完成截图，Ctrl+V 可粘贴");
-		JButton mspaint=new JButton("画图");
-		mspaint.setToolTipText("打开画图进行编辑");
-		JButton hough=new JButton("矫正");
-		hough.setToolTipText("图片矫正");
-		
-		complete.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ps.copyInShearPlate();
-			}
-		});
-		save.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ps.saveImageFile();
-			}
-		});
-		exit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ps.finishAndinitialization();
-			}
-		});
-		fill.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ps.fillImageForDevice();
-			}
-		});
-		ocr.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ps.ocrImage();
-			}
-		});
-		mspaint.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ps.mspaintImage();
-			}
-		});
-		hough.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ps.houghImage();
-			}
-		});
-		menu.add(label);
-		menu.add(save);
-		// menu.add(hough);
-		menu.add(mspaint);
-		menu.add(fill);
-		menu.add(ocr);
-		menu.add(exit);
-		menu.add(complete);
+	public MenuTool getMenu() {
+		return menu;
+	}
+	
+	public void setMenu(MenuTool menu) {
+		this.menu = menu;
 	}
 	
 }

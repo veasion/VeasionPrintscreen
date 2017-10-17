@@ -1,7 +1,7 @@
 package cn.veasion.tools;
 
 /**
- * 此枚举是判断拖拽方向用的（注：已经拖出矩形）
+ * 判断拖拽方向用的
  */
 public enum Direction {
 	STOP,

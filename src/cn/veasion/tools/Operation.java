@@ -1,8 +1,10 @@
-package cn.veasion.util;
+package cn.veasion.tools;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+
+import cn.veasion.util.StaticValue;
 
 /**
  * 截图操作记录.
