@@ -23,8 +23,7 @@ import cn.veasion.util.StaticValue;
 import cn.veasion.util.VeaUtil;
 
 /**
- * 截图JDialog窗体,程序主要框架，用于显示Robot截取屏幕图片显示<br>
- * JDialog容器可以解决窗体焦点问题 和 任务栏图标显示问题
+ * JDialog截图窗体
  * 
  * @author zhuowei.luo
  */

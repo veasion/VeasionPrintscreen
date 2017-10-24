@@ -255,6 +255,7 @@ public class MenuTool extends JPanel{
 		}
 		final Image imgTemp=img;
 		Thread t=new Thread(()->{
+			int fontSize=16;
 			String text=null;
 			try{
 				Tools.clipboard.setContents(new StringSelection("正在识别.."), null);
@@ -269,11 +270,17 @@ public class MenuTool extends JPanel{
 						byte data[]=ImageUtil.imageToBytes(imgTemp, null);
 						TextResponseForBd response=new TextResponseForBd(JSONObject.fromObject(client.general(data, new HashMap<String, String>()).toString()));
 						text=response.getTextStr();
+						if(response.getAvgFontHeight() != null){
+							fontSize=response.getAvgFontHeight().intValue();
+						}
 					}
 				}else{
 					ImageOperate imgOpe=new ImageOperate(StaticValue.faceApiKey, StaticValue.faceApiSecret);
 					ImageTextBean textBean=imgOpe.textRecognition(imgTemp);
 					text=textBean.getTextStr();
+					if(textBean.getAvgFontHeight() != null){
+						fontSize=textBean.getAvgFontHeight().intValue();
+					}
 				}
 			}catch(Exception e){
 				text="发生错误："+e.getMessage();
@@ -281,7 +288,7 @@ public class MenuTool extends JPanel{
 			}
 			Tools.clipboard.setContents(new StringSelection(text), null);
 			if(StaticValue.ocrModel==0){
-				showOcrText(text);
+				showOcrText(text, new Font("宋体", 0, fontSize));
 			}
 		});
 		t.start();
@@ -297,13 +304,16 @@ public class MenuTool extends JPanel{
 		}
 	}
 	
-	private void showOcrText(String text){
+	private void showOcrText(String text, Font font){
 		if(ocrjp==null){
 			ocrjp=new JPanel(new GridLayout(1, 1));
 			ocrArea=new JTextArea(text);
+			ocrArea.setFont(font);
+			ocrArea.setDragEnabled(true);
 			ocrjp.add(new JScrollPane(ocrArea));
 		}else{
 			ocrArea.setText(text);
+			ocrArea.setFont(font);
 		}
 		Rectangle re=r.getRect();
 		int y = re.y - (re.height > ocrHeight ? -(re.height - ocrHeight) / 2 : (ocrHeight - re.height) / 2);
@@ -312,6 +322,16 @@ public class MenuTool extends JPanel{
 		} else {
 			ocrjp.setBounds(re.x + re.width + 5, y, ocrWidth, ocrHeight);
 		}
+		Rectangle or=ocrjp.getBounds();
+		if(or.x < 0){
+			or.x = 0;
+		}
+		if (or.y + or.height > Tools.SCREEN_HEIGHT) {
+			or.y = Tools.SCREEN_HEIGHT - or.height;
+		}else if(or.y < 0){
+			or.y = 0;
+		}
+		ocrjp.setBounds(or);
 		ps.clearSelectRect();
 		ps.getLayeredPane().remove(ocrjp);
 		ps.getLayeredPane().add(ocrjp, new Integer(Integer.MAX_VALUE));

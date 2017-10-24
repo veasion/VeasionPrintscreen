@@ -18,6 +18,10 @@ public class ImageTextBean {
 	private String message;
 	private JSONObject json;
 	private List<TextValue> textList;
+	
+	private Integer avgFontHeight;
+	private Integer maxFontHeight;
+	
 	// 上到下 y-- 左到右 x++
 	
 	public ImageTextBean(FaceResponse resp){
@@ -194,10 +198,14 @@ public class ImageTextBean {
 	 * 获取平均字体高度
 	 */
 	private int avgFontHeight(){
-		if(!VeaUtil.isNullEmpty(textList)){
-			return textList.stream().mapToInt((v)->v.getH()).sum() / textList.size();
+		if(this.avgFontHeight == null){
+			if(!VeaUtil.isNullEmpty(textList)){
+				return (this.avgFontHeight = textList.stream().mapToInt((v)->v.getH()).sum() / textList.size());
+			}else{
+				return 0;
+			}
 		}else{
-			return 0;
+			return this.avgFontHeight;
 		}
 	}
 	
@@ -205,16 +213,28 @@ public class ImageTextBean {
 	 * 获取最大字体高度 
 	 */
 	private int maxFontHeight(){
-		if(!VeaUtil.isNullEmpty(textList)){
-			return textList.stream().mapToInt((v)->v.getH()).max().orElse(0);
+		if(this.maxFontHeight == null){
+			if(!VeaUtil.isNullEmpty(textList)){
+				return (this.maxFontHeight = textList.stream().mapToInt((v)->v.getH()).max().orElse(0));
+			}else{
+				return 0;
+			}
 		}else{
-			return 0;
+			return this.maxFontHeight;
 		}
 	}
 	
 	@Override
 	public String toString() {
 		return getText();
+	}
+	
+	public Integer getAvgFontHeight() {
+		return avgFontHeight;
+	}
+	
+	public Integer getMaxFontHeight() {
+		return maxFontHeight;
 	}
 
 	public class TextValue{

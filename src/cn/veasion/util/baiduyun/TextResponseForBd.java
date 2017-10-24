@@ -18,6 +18,9 @@ public class TextResponseForBd {
 	private String logId;
 	private int resultCount;
 	
+	private Double avgFontHeight;
+	private Double maxFontHeight;
+	
 	public TextResponseForBd(JSONObject json) {
 		//System.out.println(json.toString(2));
 		this.json=json;
@@ -76,10 +79,14 @@ public class TextResponseForBd {
 	 * 获取平均字体高度
 	 */
 	private double avgFontHeight(){
-		if(!VeaUtil.isNullEmpty(textValues)){
-			return textValues.stream().mapToDouble((v)->v.getH()).sum() / textValues.size();
+		if(this.avgFontHeight == null){
+			if(!VeaUtil.isNullEmpty(textValues)){
+				return (this.avgFontHeight = textValues.stream().mapToDouble((v)->v.getH()).sum() / textValues.size());
+			}else{
+				return 0;
+			}
 		}else{
-			return 0;
+			return avgFontHeight;
 		}
 	}
 	
@@ -87,10 +94,14 @@ public class TextResponseForBd {
 	 * 获取最大字体高度 
 	 */
 	private double maxFontHeight(){
-		if(!VeaUtil.isNullEmpty(textValues)){
-			return textValues.stream().mapToDouble((v)->v.getH()).max().orElse(0);
+		if(this.maxFontHeight == null){
+			if(!VeaUtil.isNullEmpty(textValues)){
+				return (this.maxFontHeight = textValues.stream().mapToDouble((v)->v.getH()).max().orElse(0));
+			}else{
+				return 0;
+			}
 		}else{
-			return 0;
+			return this.maxFontHeight;
 		}
 	}
 
@@ -157,6 +168,14 @@ public class TextResponseForBd {
 	
 	public boolean isSuccess() {
 		return this.resultCount > 0;
+	}
+	
+	public Double getAvgFontHeight() {
+		return avgFontHeight;
+	}
+	
+	public Double getMaxFontHeight() {
+		return maxFontHeight;
 	}
 	
 	public class TextValueForBd{
