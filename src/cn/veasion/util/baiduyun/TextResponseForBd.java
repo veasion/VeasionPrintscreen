@@ -33,6 +33,7 @@ public class TextResponseForBd {
 		if (this.resultCount > 0) {
 			JSONArray ret=json.optJSONArray("words_result");
 			if (ret.size() > 0) {
+				System.out.println(ret);
 				for (Object object : ret) {
 					JSONObject obj=JSONObject.fromObject(object);
 					TextValueForBd tv=new TextValueForBd();
@@ -111,12 +112,24 @@ public class TextResponseForBd {
 		if (!VeaUtil.isNullEmpty(textValues)) {
 			StringBuilder sb = new StringBuilder();
 			double y = textValues.get(0).getY();
-			for (TextValueForBd tv : textValues) {
+			double nextX = 0;
+			for (int i = 0, len = textValues.size(); i < len; i++) {
+				TextValueForBd tv = textValues.get(i);
 				if (tv.getY() > y + avgFontHeight) {
 					y = tv.getY();
 					sb.append("<br/>");
 				}
-				sb.append(tv.value).append("&nbsp;");
+				sb.append(tv.value);//sb.append("&nbsp;");
+				if(i < len-1){
+					nextX=textValues.get(i+1).x;
+					int jg=(int)(nextX - tv.x - tv.w); // 间隔
+					// 间隔追加空格
+					if(jg >= avgFontHeight){
+						for (int j = 0, size = (int) (jg / avgFontHeight); j < size; j++) {
+							sb.append("&nbsp;");
+						}
+					}
+				}
 			}
 			return sb.toString();
 		} else if (this.resultCount < 1) {
@@ -147,12 +160,24 @@ public class TextResponseForBd {
 		if (!VeaUtil.isNullEmpty(textValues)) {
 			StringBuilder sb = new StringBuilder();
 			double y = textValues.get(0).getY();
-			for (TextValueForBd tv : textValues) {
+			double nextX = 0;
+			for (int i = 0, len = textValues.size(); i < len; i++) {
+				TextValueForBd tv = textValues.get(i);
 				if (tv.getY() > y + avgFontHeight) {
 					y = tv.getY();
 					sb.append("\n");
 				}
-				sb.append(tv.getValue()).append(" ");
+				sb.append(tv.getValue());// sb.append(" ");
+				if(i < len-1){
+					nextX=textValues.get(i+1).x;
+					int jg=(int)(nextX - tv.x - tv.w); // 间隔
+					// 间隔追加空格
+					if(jg >= avgFontHeight){
+						for (int j = 0, size = (int) (jg / avgFontHeight); j < size; j++) {
+							sb.append("  ");
+						}
+					}
+				}
 			}
 			return sb.toString();
 		} else if (this.resultCount < 1) {

@@ -268,11 +268,16 @@ public class MenuTool extends JPanel{
 						client.setConnectionTimeoutInMillis(5000);
 						client.setSocketTimeoutInMillis(100000);
 						byte data[]=ImageUtil.imageToBytes(imgTemp, null);
-						TextResponseForBd response=new TextResponseForBd(JSONObject.fromObject(client.general(data, new HashMap<String, String>()).toString()));
+						String json=client.general(data, new HashMap<String, String>()).toString();
+						TextResponseForBd response=new TextResponseForBd(JSONObject.fromObject(json));
 						text=response.getTextStr();
 						if(response.getAvgFontHeight() != null){
 							fontSize=response.getAvgFontHeight().intValue();
 						}
+						
+						/*json=client.accurateGeneral(data, new HashMap<String, String>()).toString();
+						response=new TextResponseForBd(JSONObject.fromObject(json));
+						text+="\r\n\r\n=======精度高的========\r\n\r\n"+response.getTextStr();*/
 					}
 				}else{
 					ImageOperate imgOpe=new ImageOperate(StaticValue.faceApiKey, StaticValue.faceApiSecret);

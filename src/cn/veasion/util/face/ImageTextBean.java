@@ -143,12 +143,24 @@ public class ImageTextBean {
 		if (!VeaUtil.isNullEmpty(textList)) {
 			StringBuilder sb = new StringBuilder();
 			int y = textList.get(0).getY();
-			for (TextValue tv : textList) {
+			int nextX = 0;
+			for (int i = 0, len = textList.size(); i < len; i++) {
+				TextValue tv = textList.get(i);
 				if (tv.getY() > y + avgFontHeight) {
 					y = tv.getY();
 					sb.append("<br/>");
 				}
 				sb.append(tv.value).append("&nbsp;");
+				if(i < len-1){
+					nextX=textList.get(i+1).x;
+					int jg=(int)(nextX - tv.x - tv.w); // 间隔
+					// 间隔追加空格
+					if(jg >= avgFontHeight){
+						for (int j = 0, size = (int) (jg / avgFontHeight); j < size; j++) {
+							sb.append("&nbsp;");
+						}
+					}
+				}
 			}
 			return sb.toString();
 		} else if (this.status != 200) {
@@ -179,12 +191,24 @@ public class ImageTextBean {
 		if (!VeaUtil.isNullEmpty(textList)) {
 			StringBuilder sb = new StringBuilder();
 			int y = textList.get(0).getY();
-			for (TextValue tv : textList) {
+			int nextX = 0;
+			for (int i = 0, len = textList.size(); i < len; i++) {
+				TextValue tv = textList.get(i);
 				if (tv.getY() > y + avgFontHeight) {
 					y = tv.getY();
 					sb.append("\n");
 				}
-				sb.append(tv.value).append(" ");
+				sb.append(tv.getValue());// sb.append(" ");
+				if(i < len-1){
+					nextX=textList.get(i+1).x;
+					int jg=(int)(nextX - tv.x - tv.w); // 间隔
+					// 间隔追加空格
+					if(jg >= avgFontHeight){
+						for (int j = 0, size = (int) (jg / avgFontHeight); j < size; j++) {
+							sb.append("  ");
+						}
+					}
+				}
 			}
 			return sb.toString();
 		} else if (this.status != 200) {
