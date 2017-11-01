@@ -90,6 +90,15 @@ public class ConfigUtil {
 	}
 	
 	/**
+	 * 根据key获取值. 
+	 * 
+	 * @param defaultValue 如果没有或报错就返回该默认值.
+	 */
+	public static int getProperty(String key, int defaultValue){
+		return VeaUtil.valueOfInt(getProperty(key), defaultValue);
+	}
+	
+	/**
 	 * 根据key获取boolean值
 	 */
 	public static boolean getPropertyBoolean(String key, boolean defaultVal){

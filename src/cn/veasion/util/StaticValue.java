@@ -1,7 +1,6 @@
 package cn.veasion.util;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,99 +16,98 @@ import cn.veasion.util.ocr.OcrTextResult;
 public class StaticValue {
 
 	/**
-	 * Name 
+	 * Name
 	 */
-	public static final String name="伟神";
-	
+	public static final String name = "伟神";
+
 	/**
-	 * 快捷键 
+	 * 快捷键
 	 */
-	public static int printKey1=JIntellitype.MOD_CONTROL;
-	public static int printKey2=(int)'B';
-	
+	public static int printKey1 = JIntellitype.MOD_CONTROL;
+	public static int printKey2 = (int) 'B';
+
 	/**
-	 * 自适应设备宽度 
+	 * 自适应设备宽度
 	 */
-	public static int deviceWidth=630;
-	
+	public static int deviceWidth = 630;
+
 	/**
 	 * 自适应背景颜色
 	 */
-	public static Color deviceBgColor=Color.white;
-	
+	public static Color deviceBgColor = Color.white;
+
 	/**
 	 * 截图后是否固定
 	 */
-	public static boolean psFixed=false;
-	
+	public static boolean psFixed = false;
+
 	/**
-	 * 图片旋转统计范围 
+	 * 图片旋转统计范围
 	 */
-	public static int rangeValue=3;
-	
+	public static int rangeValue = 3;
+
 	/**
 	 * 文字识别模式，0 前台，1 后台
 	 */
 	public static int ocrModel = 0;
-	
+
 	/**
 	 * 文字识别引擎，0 face++，1 百度云
 	 */
 	public static int ocrEngine = 0;
-	
+
 	/**
-	 * 文字识别结果排版 
+	 * 文字识别结果排版
 	 */
 	public static int ocrTypesetting = OcrTextResult.TYPESETTING_EQUALLY;
-	
+
 	/**
 	 * Face
 	 */
-	public static String faceApiKey="rGhXZjSqWLOluq04axCW80jCm21I-j32";
-    public static String faceApiSecret="imOWbNz3RUJ8GcIepLdVvxvoFrJsS9e-";
-    
-    /**
-     * 百度云 
-     */
-    public static String baiduAppId="";
-    public static String baiduApiKey="";
-    public static String baiduSecretKey="";
-    
-    
-    public static void write(){
-    	// 写入配置
-    	Map<String, Object> map=new HashMap<>();
-    	map.put("printKey1", printKey1);
-    	map.put("printKey2", printKey2);
-    	map.put("deviceWidth", deviceWidth);
-    	map.put("deviceBgColor", deviceBgColor==Color.black ? "黑色" : "白色");
-    	map.put("psFixed", psFixed);
-    	map.put("ocrEngine", ocrEngine);
-    	map.put("ocrModel", ocrModel);
-    	map.put("faceApiKey", faceApiKey);
-    	map.put("faceApiSecret", faceApiSecret);
-    	map.put("baiduAppId", baiduAppId);
-    	map.put("baiduApiKey", baiduApiKey);
-    	map.put("baiduSecretKey", baiduSecretKey);
-    	map.put("ocrTypesetting", ocrTypesetting);
-    	ConfigUtil.write(map);
-    }
-    
-    static{
-    	// 读取配置
-    	printKey1=VeaUtil.valueOfInt(ConfigUtil.getProperty("printKey1", String.valueOf(printKey1)), printKey1);
-    	printKey2=VeaUtil.valueOfInt(ConfigUtil.getProperty("printKey2", String.valueOf(printKey2)), printKey2);
-    	deviceWidth=VeaUtil.valueOfInt(ConfigUtil.getProperty("deviceWidth", String.valueOf(deviceWidth)), deviceWidth);
-    	deviceBgColor="黑色".equals(ConfigUtil.getProperty("deviceBgColor", "黑色")) ? Color.black : Color.white;
-    	psFixed=ConfigUtil.getPropertyBoolean("psFixed", false);
-    	ocrEngine=VeaUtil.valueOfInt(ConfigUtil.getProperty("ocrEngine", String.valueOf(ocrEngine)), ocrEngine);
-    	ocrModel=VeaUtil.valueOfInt(ConfigUtil.getProperty("ocrModel", String.valueOf(ocrModel)), ocrModel);
-    	ocrTypesetting=VeaUtil.valueOfInt(ConfigUtil.getProperty("ocrTypesetting", String.valueOf(ocrTypesetting)), ocrTypesetting);
-    	faceApiKey=ConfigUtil.getProperty("faceApiKey", faceApiKey);
-    	faceApiSecret=ConfigUtil.getProperty("faceApiSecret", faceApiSecret);
-    	baiduAppId=ConfigUtil.getProperty("baiduAppId", baiduAppId);
-    	baiduApiKey=ConfigUtil.getProperty("baiduApiKey", baiduApiKey);
-    	baiduSecretKey=ConfigUtil.getProperty("baiduSecretKey", baiduSecretKey);
-    }
-    
+	public static String faceApiKey = "rGhXZjSqWLOluq04axCW80jCm21I-j32";
+	public static String faceApiSecret = "imOWbNz3RUJ8GcIepLdVvxvoFrJsS9e-";
+
+	/**
+	 * 百度云
+	 */
+	public static String baiduAppId = "";
+	public static String baiduApiKey = "";
+	public static String baiduSecretKey = "";
+
+	public static void write() {
+		// 写入配置
+		Map<String, Object> map = new HashMap<>();
+		map.put("printKey1", printKey1);
+		map.put("printKey2", printKey2);
+		map.put("deviceWidth", deviceWidth);
+		map.put("deviceBgColor", deviceBgColor == Color.black ? "黑色" : "白色");
+		map.put("psFixed", psFixed);
+		map.put("ocrEngine", ocrEngine);
+		map.put("ocrModel", ocrModel);
+		map.put("faceApiKey", faceApiKey);
+		map.put("faceApiSecret", faceApiSecret);
+		map.put("baiduAppId", baiduAppId);
+		map.put("baiduApiKey", baiduApiKey);
+		map.put("baiduSecretKey", baiduSecretKey);
+		map.put("ocrTypesetting", ocrTypesetting);
+		ConfigUtil.write(map);
+	}
+	
+	static {
+		// 读取配置
+		printKey1 = ConfigUtil.getProperty("printKey1", printKey1);
+		printKey2 = ConfigUtil.getProperty("printKey2", printKey2);
+		deviceWidth = ConfigUtil.getProperty("deviceWidth", deviceWidth);
+		deviceBgColor = "黑色".equals(ConfigUtil.getProperty("deviceBgColor", "黑色")) ? Color.black : Color.white;
+		psFixed = ConfigUtil.getPropertyBoolean("psFixed", false);
+		ocrEngine = ConfigUtil.getProperty("ocrEngine", ocrEngine);
+		ocrModel = ConfigUtil.getProperty("ocrModel", ocrModel);
+		ocrTypesetting = ConfigUtil.getProperty("ocrTypesetting", ocrTypesetting);
+		faceApiKey = ConfigUtil.getProperty("faceApiKey", faceApiKey);
+		faceApiSecret = ConfigUtil.getProperty("faceApiSecret", faceApiSecret);
+		baiduAppId = ConfigUtil.getProperty("baiduAppId", baiduAppId);
+		baiduApiKey = ConfigUtil.getProperty("baiduApiKey", baiduApiKey);
+		baiduSecretKey = ConfigUtil.getProperty("baiduSecretKey", baiduSecretKey);
+	}
+	
 }

@@ -1,16 +1,10 @@
 package cn.veasion.main;
 
-import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Enumeration;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.plaf.FontUIResource;
-
-import cn.veasion.util.StaticValue;
 
 /**
  * 运行程序Main方法.

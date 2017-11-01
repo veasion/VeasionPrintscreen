@@ -45,9 +45,9 @@ public class HttpRequest {
         conne.setRequestProperty("connection", "Keep-Alive");
         conne.setRequestProperty("user-agent", "Mozilla/4.0 (compatible;MSIE 6.0;Windows NT 5.1;SV1)");
         DataOutputStream obos = new DataOutputStream(conne.getOutputStream());
-        Iterator iter = map.entrySet().iterator();
+        Iterator<Map.Entry<String, String>> iter = map.entrySet().iterator();
         while(iter.hasNext()){
-            Map.Entry<String, String> entry = (Map.Entry) iter.next();
+            Map.Entry<String, String> entry = (Map.Entry<String, String>) iter.next();
             String key = entry.getKey();
             String value = entry.getValue();
             obos.writeBytes("--" + boundaryString + "\r\n");
@@ -57,7 +57,7 @@ public class HttpRequest {
             obos.writeBytes(value + "\r\n");
         }
         if(fileMap != null && fileMap.size() > 0){
-            Iterator fileIter = fileMap.entrySet().iterator();
+            Iterator<Map.Entry<String, byte[]>> fileIter = fileMap.entrySet().iterator();
             while(fileIter.hasNext()){
                 Map.Entry<String, byte[]> fileEntry = (Map.Entry<String, byte[]>) fileIter.next();
                 obos.writeBytes("--" + boundaryString + "\r\n");
