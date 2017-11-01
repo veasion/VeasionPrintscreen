@@ -1,4 +1,4 @@
-package cn.veasion.util.face;
+package cn.veasion.util.ocr.face;
 
 /**
  * HTTP 请求的结果，包含返回的状态码和返回内容

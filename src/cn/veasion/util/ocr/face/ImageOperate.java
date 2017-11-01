@@ -1,4 +1,4 @@
-package cn.veasion.util.face;
+package cn.veasion.util.ocr.face;
 
 import java.awt.Image;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ public class ImageOperate {
     /**
      * 文字识别
      */
-	public ImageTextBean textRecognition(Image image) throws Exception {
+	public OcrTextBeanForFace textRecognition(Image image) throws Exception {
 		HashMap<String, String> map = new HashMap<>();
 		HashMap<String, byte[]> fileMap = new HashMap<>();
 		map.put("api_key", apiKey);
@@ -32,7 +32,7 @@ public class ImageOperate {
 		// 返回Base64编码过的字节数组字符串
 		map.put("image_base64", ImageUtil.imageToBase64(image, null));
 		//System.out.println(map.get("image_base64"));
-		return new ImageTextBean(HttpRequest.post(TEXT_RE, map, fileMap));
+		return new OcrTextBeanForFace(HttpRequest.post(TEXT_RE, map, fileMap));
 	}
 	
 }

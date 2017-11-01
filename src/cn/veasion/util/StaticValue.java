@@ -47,7 +47,7 @@ public class StaticValue {
 	/**
 	 * 文字识别模式，0 前台，1 后台
 	 */
-	public static int ocrModel = 1;
+	public static int ocrModel = 0;
 	
 	/**
 	 * 文字识别引擎，0 face++，1 百度云

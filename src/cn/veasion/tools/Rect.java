@@ -285,6 +285,7 @@ public class Rect {
 		ps.clearSelectRect();
 		ps.getLayeredPane().remove(menu);
 		ps.getLayeredPane().add(menu, new Integer(Integer.MAX_VALUE));
+		// menu.showOcrText();
 	}
 	
 	public MenuTool getMenu() {

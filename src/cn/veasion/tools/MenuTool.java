@@ -17,12 +17,20 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.text.JTextComponent;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 
 import com.baidu.aip.ocr.AipOcr;
 
@@ -30,9 +38,10 @@ import cn.veasion.main.Printscreen;
 import cn.veasion.util.ImageUtil;
 import cn.veasion.util.StaticValue;
 import cn.veasion.util.VeaUtil;
-import cn.veasion.util.baiduyun.TextResponseForBd;
-import cn.veasion.util.face.ImageOperate;
-import cn.veasion.util.face.ImageTextBean;
+import cn.veasion.util.ocr.OcrTextResult;
+import cn.veasion.util.ocr.baidu.OcrTextBeanForBaidu;
+import cn.veasion.util.ocr.face.ImageOperate;
+import cn.veasion.util.ocr.face.OcrTextBeanForFace;
 import net.sf.json.JSONObject;
 
 /**
@@ -48,10 +57,14 @@ public class MenuTool extends JPanel{
 	private Rect r;
 	
 	private JPanel ocrjp;
-	private JTextArea ocrArea;
+	private JTextComponent ocrTextCom;
+	private UndoManager undo;
 	
 	private int ocrWidth=400;
 	private int ocrHeight=300;
+	
+	private String ocrText;
+	private Font ocrFont;
 	
 	public MenuTool(Printscreen ps, Rect r){
 		this.ps=ps;
@@ -230,28 +243,37 @@ public class MenuTool extends JPanel{
 	public void ocrImage(){
 		Rectangle re = r.getRect();
 		Image img=ps.getScreenImage();
-		if (re.width < 48 || re.height < 48) {
-			BufferedImage buff=new BufferedImage(re.width < 48 ? 50 : re.width, re.height < 48 ? 50 : re.height, BufferedImage.TYPE_INT_RGB);
-			Graphics g=buff.getGraphics();
-			g.drawImage(img, 0, 0, re.width, re.height, null);
-			g.setColor(StaticValue.deviceBgColor);
-			if(re.width<48){
-				g.fillRect(re.width, 0, 50-re.width, re.height);
+		if(StaticValue.ocrEngine==0){
+			// face++ 图片识别压缩
+			if (re.width < 48 || re.height < 48) {
+				BufferedImage buff=new BufferedImage(re.width < 48 ? 50 : re.width, re.height < 48 ? 50 : re.height, BufferedImage.TYPE_INT_RGB);
+				Graphics g=buff.getGraphics();
+				g.drawImage(img, 0, 0, re.width, re.height, null);
+				g.setColor(StaticValue.deviceBgColor);
+				if(re.width<48){
+					g.fillRect(re.width, 0, 50-re.width, re.height);
+				}
+				if(re.height<48){
+					g.fillRect(0, re.height, re.width < 48 ? 50 : re.width, 50 - re.height);
+				}
+				img=(Image)buff;
+			} else if (re.width > 1200 || re.height > 1200){
+				if(StaticValue.ocrModel==0){
+					ocrText = "识别失败：图片不能超过1200*1200";
+					ocrFont = new Font("宋体", 0, 16);
+					this.showOcrText(ocrText, ocrFont);
+				}else{
+					Tools.clipboard.setContents(new StringSelection("识别失败：图片不能超过1200*1200"), null);
+					ps.finishAndinitialization();
+				}
+				return;
+			} else if (re.width > 800 && re.width < 1200) {
+				// 压缩
+				img = ImageUtil.zoomImage((BufferedImage) img, (float) 800 / re.width);
+			} else if (re.height > 800 && re.height < 1200) {
+				// 压缩
+				img = ImageUtil.zoomImage((BufferedImage) img, (float) 800 / re.height);
 			}
-			if(re.height<48){
-				g.fillRect(0, re.height, re.width < 48 ? 50 : re.width, 50 - re.height);
-			}
-			img=(Image)buff;
-		} else if (re.width > 1200 || re.height > 1200){
-			Tools.clipboard.setContents(new StringSelection("识别失败：图片不能超过1200*1200"), null);
-			ps.finishAndinitialization();
-			return;
-		} else if (re.width > 800 && re.width < 1200) {
-			// 压缩
-			img = ImageUtil.zoomImage((BufferedImage) img, (float) 800 / re.width);
-		} else if (re.height > 800 && re.height < 1200) {
-			// 压缩
-			img = ImageUtil.zoomImage((BufferedImage) img, (float) 800 / re.height);
 		}
 		final Image imgTemp=img;
 		Thread t=new Thread(()->{
@@ -269,22 +291,24 @@ public class MenuTool extends JPanel{
 						client.setSocketTimeoutInMillis(100000);
 						byte data[]=ImageUtil.imageToBytes(imgTemp, null);
 						String json=client.general(data, new HashMap<String, String>()).toString();
-						TextResponseForBd response=new TextResponseForBd(JSONObject.fromObject(json));
-						text=response.getTextStr();
-						if(response.getAvgFontHeight() != null){
-							fontSize=response.getAvgFontHeight().intValue();
+						OcrTextBeanForBaidu response=new OcrTextBeanForBaidu(JSONObject.fromObject(json));
+						OcrTextResult result=new OcrTextResult(response);
+						text=result.getResultTest();
+						if(result.getAvgFontHeight() != null){
+							fontSize=result.getAvgFontHeight().intValue();
 						}
 						
 						/*json=client.accurateGeneral(data, new HashMap<String, String>()).toString();
-						response=new TextResponseForBd(JSONObject.fromObject(json));
-						text+="\r\n\r\n=======精度高的========\r\n\r\n"+response.getTextStr();*/
+						response=new OcrTextBeanForBaidu(JSONObject.fromObject(json));
+						text+="\r\n\r\n=======精度高的========\r\n\r\n"+new OcrTextResult(response).getResultTest();*/
 					}
 				}else{
 					ImageOperate imgOpe=new ImageOperate(StaticValue.faceApiKey, StaticValue.faceApiSecret);
-					ImageTextBean textBean=imgOpe.textRecognition(imgTemp);
-					text=textBean.getTextStr();
-					if(textBean.getAvgFontHeight() != null){
-						fontSize=textBean.getAvgFontHeight().intValue();
+					OcrTextBeanForFace textBean=imgOpe.textRecognition(imgTemp);
+					OcrTextResult result=new OcrTextResult(textBean);
+					text=result.getResultTest();
+					if(result.getAvgFontHeight() != null){
+						fontSize=result.getAvgFontHeight().intValue();
 					}
 				}
 			}catch(Exception e){
@@ -293,7 +317,14 @@ public class MenuTool extends JPanel{
 			}
 			Tools.clipboard.setContents(new StringSelection(text), null);
 			if(StaticValue.ocrModel==0){
-				showOcrText(text, new Font("宋体", 0, fontSize));
+				ocrText = text;
+				if(fontSize < 9){
+					fontSize = 9;
+				}else if(fontSize > 22){
+					fontSize = 22;
+				}
+				ocrFont = new Font("宋体", 0, fontSize);
+				this.showOcrText(ocrText, ocrFont);
 			}
 		});
 		t.start();
@@ -309,18 +340,48 @@ public class MenuTool extends JPanel{
 		}
 	}
 	
+	/**
+	 * 显示OCR文本框 
+	 */
+	public void showOcrText(){
+		if(StaticValue.ocrModel == 0 && ocrText != null && ocrFont != null){
+			this.showOcrText(ocrText, ocrFont);
+		}
+	}
+	
+	/**
+	 * 显示OCR文本框 
+	 */
 	private void showOcrText(String text, Font font){
 		if(ocrjp==null){
-			ocrjp=new JPanel(new GridLayout(1, 1));
-			ocrArea=new JTextArea(text);
-			ocrArea.setFont(font);
-			ocrArea.setDragEnabled(true);
-			ocrjp.add(new JScrollPane(ocrArea));
+			// 初始化OCR文本框
+			this.initOcrText(text, font);
 		}else{
-			ocrArea.setText(text);
-			ocrArea.setFont(font);
+			ocrTextCom.setText(text);
+			ocrTextCom.setFont(font);
 		}
+		
 		Rectangle re=r.getRect();
+		ocrWidth = (int)re.getWidth();
+		ocrHeight = (int)re.getHeight();
+		double maxWidth = Math.max(re.getX() - 0, Tools.SCREEN_WIDTH - re.getX() - re.getWidth());
+		if(ocrWidth < 400){
+			ocrWidth = 400;
+		} else if (ocrWidth > maxWidth) {
+			ocrWidth = (int)maxWidth - 6;
+			if(ocrWidth < 400){
+				ocrWidth = 400;
+			}
+		}
+		if(ocrHeight < 300){
+			ocrHeight = 300;
+		}else if(ocrHeight > Tools.SCREEN_HEIGHT / 2){
+			ocrHeight = (int)(Tools.SCREEN_HEIGHT / 2);
+			if(ocrHeight < 300){
+				ocrHeight = 300;
+			}
+		}
+		
 		int y = re.y - (re.height > ocrHeight ? -(re.height - ocrHeight) / 2 : (ocrHeight - re.height) / 2);
 		if (re.x + re.width + ocrWidth + 5 > Tools.SCREEN_WIDTH) {
 			ocrjp.setBounds(re.x - ocrWidth - 5, y, ocrWidth, ocrHeight);
@@ -340,6 +401,47 @@ public class MenuTool extends JPanel{
 		ps.clearSelectRect();
 		ps.getLayeredPane().remove(ocrjp);
 		ps.getLayeredPane().add(ocrjp, new Integer(Integer.MAX_VALUE));
+	}
+	
+	/**
+	 * 初始化OCR文本框 
+	 */
+	private void initOcrText(String text, Font font){
+		ocrjp=new JPanel(new GridLayout(1, 1));
+		ocrTextCom=new JTextArea(text);
+		undo=new UndoManager();
+		ocrTextCom.getDocument().addUndoableEditListener(new UndoableEditListener() {
+			public void undoableEditHappened(UndoableEditEvent e) {
+				undo.addEdit(e.getEdit());
+			}
+		});
+		ocrTextCom.getActionMap().put("Undo", new AbstractAction("Undo") {
+			private static final long serialVersionUID = 1L;
+			public void actionPerformed(ActionEvent evt) {
+				try {
+					if (undo.canUndo()) {
+						undo.undo();
+					}
+				} catch (CannotUndoException e) {
+				}
+			}
+		});
+		ocrTextCom.getInputMap().put(KeyStroke.getKeyStroke("control Z"), "Undo");
+		ocrTextCom.getActionMap().put("Redo", new AbstractAction("Redo") {
+			private static final long serialVersionUID = 1L;
+			public void actionPerformed(ActionEvent evt) {
+				try {
+					if (undo.canRedo()) {
+						undo.redo();
+					}
+				} catch (CannotRedoException e) {
+				}
+			}
+		});
+		ocrTextCom.getInputMap().put(KeyStroke.getKeyStroke("control Y"), "Redo");
+		ocrTextCom.setFont(font);
+		ocrTextCom.setDragEnabled(true);
+		ocrjp.add(new JScrollPane(ocrTextCom));
 	}
 	
 	public JPanel getOcrjp() {

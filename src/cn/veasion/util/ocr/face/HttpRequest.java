@@ -1,4 +1,4 @@
-package cn.veasion.util.face;
+package cn.veasion.util.ocr.face;
 
 
 import java.io.ByteArrayOutputStream;

@@ -111,7 +111,7 @@ public class VeasionFrame extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				cboKey.setSelectedIndex(1);
 				cbx.setSelectedIndex(0);
-				cbx1.setSelectedIndex(1);
+				cbx1.setSelectedIndex(0);
 				cbx2.setSelectedIndex(0);
 				r2.setSelected(true);
 				jkey.setText("B");
