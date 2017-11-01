@@ -11,7 +11,35 @@ import cn.veasion.util.VeaUtil;
  */
 public class OcrTextResult {
 	
+	/**
+	 * 等间距排版 
+	 */
+	public static final int TYPESETTING_EQUALLY=0;
+	
+	/**
+	 * 忽略垂直间距排版
+	 */
+	public static final int TYPESETTING_IGNORE_Y=1;
+	
+	/**
+	 * 忽略水平间距排版 
+	 */
+	public static final int TYPESETTING_IGNORE_X=2;
+	
+	/**
+	 * 缩小间距排版
+	 * 
+	 * @see 不管间距有多大都只看成一个单位间距
+	 */
+	public static final int TYPESETTING_X_Y=3;
+	
+	/**
+	 * 不排版 
+	 */
+	public static final int TYPESETTING_NULL=4;
+	
 	private List<TextValue> textValues;
+	private int typesetting;
 	private boolean isSuccess;
 	private String result;
 	
@@ -21,8 +49,9 @@ public class OcrTextResult {
 	private final String newline="\n";
 	private final String space="  ";
 	
-	public OcrTextResult(OcrTextBean textBean){
+	public OcrTextResult(OcrTextBean textBean, int typesetting){
 		this.textValues = textBean.getTextValues();
+		this.typesetting = typesetting;
 		this.isSuccess = textBean.isSuccess();
 		this.result = textBean.errorMessage();
 		if(this.isSuccess){
@@ -75,7 +104,14 @@ public class OcrTextResult {
 				TextValue tv = textValues.get(i);
 				// 文字垂直间隔排版 （文本换行）
 				if (tv.getY() > y + avgFontHeight) {
-					int h = (int) Math.round((tv.getY() - y) / avgFontHeight);
+					int h = 0;
+					if (TYPESETTING_IGNORE_Y == typesetting || TYPESETTING_NULL == typesetting) {
+						h = 0;
+					}else if(TYPESETTING_X_Y == typesetting){
+						h = 1;
+					}else{
+						h = (int) Math.round((tv.getY() - y) / avgFontHeight);
+					}
 					for (int j = 0; j < h; j++) {
 						sb.append(newline);
 					}
@@ -84,7 +120,14 @@ public class OcrTextResult {
 				}
 				// 文字水平间隔排版 （追加空格）
 				if (tv.getX() - topRightX > avgFontHeight) {
-					int size = (int) Math.round((tv.getX() - topRightX) / avgFontHeight);
+					int size = 0;
+					if (TYPESETTING_IGNORE_X == typesetting || TYPESETTING_NULL == typesetting) {
+						size = 0;
+					}else if(TYPESETTING_X_Y == typesetting){
+						size = 1;
+					}else{
+						size = (int) Math.round((tv.getX() - topRightX) / avgFontHeight);
+					}
 					for (int j = 0; j < size; j++) {
 						sb.append(space);
 					}

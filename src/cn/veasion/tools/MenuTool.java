@@ -65,6 +65,7 @@ public class MenuTool extends JPanel{
 	
 	private String ocrText;
 	private Font ocrFont;
+	private boolean isOcr;
 	
 	public MenuTool(Printscreen ps, Rect r){
 		this.ps=ps;
@@ -97,7 +98,12 @@ public class MenuTool extends JPanel{
 		
 		complete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ps.copyInShearPlate();
+				if(isOcr && StaticValue.ocrModel==0 && !VeaUtil.isNullEmpty(ocrTextCom.getText())){
+					Tools.clipboard.setContents(new StringSelection(ocrTextCom.getText()), null);
+					ps.finishAndinitialization();
+				}else{
+					ps.copyInShearPlate();
+				}
 			}
 		});
 		save.addActionListener(new ActionListener() {
@@ -292,7 +298,7 @@ public class MenuTool extends JPanel{
 						byte data[]=ImageUtil.imageToBytes(imgTemp, null);
 						String json=client.general(data, new HashMap<String, String>()).toString();
 						OcrTextBeanForBaidu response=new OcrTextBeanForBaidu(JSONObject.fromObject(json));
-						OcrTextResult result=new OcrTextResult(response);
+						OcrTextResult result=new OcrTextResult(response, StaticValue.ocrTypesetting);
 						text=result.getResultTest();
 						if(result.getAvgFontHeight() != null){
 							fontSize=result.getAvgFontHeight().intValue();
@@ -305,7 +311,7 @@ public class MenuTool extends JPanel{
 				}else{
 					ImageOperate imgOpe=new ImageOperate(StaticValue.faceApiKey, StaticValue.faceApiSecret);
 					OcrTextBeanForFace textBean=imgOpe.textRecognition(imgTemp);
-					OcrTextResult result=new OcrTextResult(textBean);
+					OcrTextResult result=new OcrTextResult(textBean, StaticValue.ocrTypesetting);
 					text=result.getResultTest();
 					if(result.getAvgFontHeight() != null){
 						fontSize=result.getAvgFontHeight().intValue();
@@ -407,6 +413,7 @@ public class MenuTool extends JPanel{
 	 * 初始化OCR文本框 
 	 */
 	private void initOcrText(String text, Font font){
+		this.isOcr = true;
 		ocrjp=new JPanel(new GridLayout(1, 1));
 		ocrTextCom=new JTextArea(text);
 		undo=new UndoManager();

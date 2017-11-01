@@ -1,6 +1,7 @@
 package cn.veasion.main;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,20 +39,32 @@ public class VeasionFrame extends JFrame{
 	private Printscreen p=new Printscreen();
 	
 	public VeasionFrame(){
+		
 		this.setLayout(new GridLayout(0, 2));
 		this.setTitle(StaticValue.name+"截图工具 --Veasion");
 		this.setLocationRelativeTo(null);
+		
 		this.add(new JLabel("文字识别引擎："));
-		JComboBox<String> cbx=new JComboBox<>(new String[]{"Face++", "百度云"});
-		cbx.setSelectedIndex(StaticValue.ocrEngine);
-		this.add(cbx);
+		JComboBox<String> ocrEngineComb=new JComboBox<>(new String[]{"Face++", "百度云"});
+		ocrEngineComb.setSelectedIndex(StaticValue.ocrEngine);
+		this.add(ocrEngineComb);
+		
+		
 		this.add(new JLabel("文字识别模式："));
-		JComboBox<String> cbx1=new JComboBox<>(new String[]{"前台", "后台"});
-		cbx1.setSelectedIndex(StaticValue.ocrModel);
-		this.add(cbx1);
+		JComboBox<String> ocrModelComb=new JComboBox<>(new String[]{"前台", "后台"});
+		ocrModelComb.setSelectedIndex(StaticValue.ocrModel);
+		this.add(ocrModelComb);
+		
+		
+		this.add(new JLabel("文字识别结果排版："));
+		JComboBox<String> ocrTypesettingComb=new JComboBox<>(new String[]{"等间距", "忽略垂直间距", "忽略水平间距", "缩小间距", "不排版"});
+		ocrTypesettingComb.setSelectedIndex(StaticValue.ocrTypesetting);
+		this.add(ocrTypesettingComb);
+		
+		
 		this.add(new JLabel("自适应宽度："));
-		JTextField tf1=new JTextField(String.valueOf(StaticValue.deviceWidth), 4);
-		tf1.addKeyListener(new KeyAdapter() {
+		JTextField deviceWidthTxt=new JTextField(String.valueOf(StaticValue.deviceWidth), 4);
+		deviceWidthTxt.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				int k=e.getKeyCode();
@@ -59,89 +72,100 @@ public class VeasionFrame extends JFrame{
 					if ((k >= 48 && k <= 57) || (k >= 96 && k <= 105) || k == 8) {
 						super.keyReleased(e);
 					} else {
-						tf1.setText(tf1.getText().replaceAll("\\D+", ""));
+						deviceWidthTxt.setText(deviceWidthTxt.getText().replaceAll("\\D+", ""));
 					}
-					int v=VeaUtil.valueOfInt(tf1.getText(), 0);
+					int v=VeaUtil.valueOfInt(deviceWidthTxt.getText(), 0);
 					if (v <= 0 || v > 5000) {
-						tf1.setText("630");
+						deviceWidthTxt.setText("630");
 					}
 				}
 			}
 		});
-		this.add(tf1);
-		this.add(new JLabel("截图快捷键："));
+		this.add(deviceWidthTxt);
 		
-		JPanel jp=new JPanel(new GridLayout(1, 0));
-		JComboBox<String> cboKey=new JComboBox<>(new String[]{"Shift", "Ctrl", "Win", "Alt"});
-		cboKey.setSelectedIndex(indexModKeyIndex());
-		jp.add(cboKey);
-		jp.add(new JLabel("+", JLabel.CENTER));
-		JTextField jkey=new JTextField(String.valueOf((char)StaticValue.printKey2));
-		jkey.addKeyListener(new KeyAdapter() {
+		
+		this.add(new JLabel("截图快捷键："));
+		JPanel panel=new JPanel(new GridLayout(1, 0));
+		JComboBox<String> key1Comb=new JComboBox<>(new String[]{"Shift", "Ctrl", "Win", "Alt"});
+		key1Comb.setSelectedIndex(indexModKeyIndex());
+		panel.add(key1Comb);
+		panel.add(new JLabel("+", JLabel.CENTER));
+		JTextField key2Txt=new JTextField(String.valueOf((char)StaticValue.printKey2));
+		key2Txt.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if (jkey.getText().length() > 0) {
-					jkey.setText(jkey.getText().toUpperCase().substring(jkey.getText().length()-1));
+				if (key2Txt.getText().length() > 0) {
+					key2Txt.setText(key2Txt.getText().toUpperCase().substring(key2Txt.getText().length()-1));
 				}
 			}
 		});
-		jp.add(jkey);
-		this.add(jp);
+		panel.add(key2Txt);
+		this.add(panel);
+		
+		
 		this.add(new JLabel("自适应背景："));
-		JComboBox<String> cbx2=new JComboBox<>(new String[]{"白色", "黑色"});
-		cbx2.setSelectedIndex(StaticValue.deviceBgColor==Color.black ? 1 : 0);
-		this.add(cbx2);
+		JComboBox<String> deviceBgComb=new JComboBox<>(new String[]{"白色", "黑色"});
+		deviceBgComb.setSelectedIndex(StaticValue.deviceBgColor==Color.black ? 1 : 0);
+		this.add(deviceBgComb);
+		
+		
 		this.add(new JLabel("截图操作后是否固定截图框："));
-		JPanel jp2=new JPanel(new GridLayout(1, 0));
-		JRadioButton r1=new JRadioButton("是", StaticValue.psFixed);
-		JRadioButton r2=new JRadioButton("否", !StaticValue.psFixed);
+		JPanel radioPanel=new JPanel(new GridLayout(1, 0));
+		JRadioButton yesRad=new JRadioButton("是", StaticValue.psFixed);
+		JRadioButton noRad=new JRadioButton("否", !StaticValue.psFixed);
 		ButtonGroup bg=new ButtonGroup();
-		bg.add(r1);bg.add(r2);
-		jp2.add(r1);jp2.add(r2);
-		this.add(jp2);
+		bg.add(yesRad);bg.add(noRad);
+		radioPanel.add(yesRad);radioPanel.add(noRad);
+		this.add(radioPanel);
+		
+		
 		this.add(new JLabel("配置文件："));
-		JTextField jtf=new JTextField(ConfigUtil.configPath);
-		jtf.setEnabled(false);
-		jtf.setToolTipText(jtf.getText());
-		this.add(jtf);
-		JButton b1=new JButton("重置");
-		JButton b2=new JButton("保存");
-		b1.addActionListener(new ActionListener() {
+		JTextField configTxt=new JTextField(ConfigUtil.configPath);
+		configTxt.setEnabled(false);
+		configTxt.setToolTipText(configTxt.getText());
+		this.add(configTxt);
+		
+		
+		JButton reset=new JButton("重置");
+		JButton save=new JButton("保存");
+		reset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				cboKey.setSelectedIndex(1);
-				cbx.setSelectedIndex(0);
-				cbx1.setSelectedIndex(0);
-				cbx2.setSelectedIndex(0);
-				r2.setSelected(true);
-				jkey.setText("B");
-				tf1.setText("630");
-				b2.doClick();
+				key1Comb.setSelectedIndex(1);
+				ocrEngineComb.setSelectedIndex(0);
+				ocrModelComb.setSelectedIndex(0);
+				deviceBgComb.setSelectedIndex(0);
+				ocrTypesettingComb.setSelectedIndex(0);
+				noRad.setSelected(true);
+				key2Txt.setText("B");
+				deviceWidthTxt.setText("630");
+				save.doClick();
 			}
 		});
-		b2.addActionListener(new ActionListener() {
+		save.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				StaticValue.printKey1=new int[]{JIntellitype.MOD_SHIFT, JIntellitype.MOD_CONTROL, JIntellitype.MOD_WIN, JIntellitype.MOD_ALT}[cboKey.getSelectedIndex()];
-				if (jkey.getText().length() > 0) {
-					StaticValue.printKey2=(int)jkey.getText().toUpperCase().charAt(0);
+				StaticValue.printKey1=new int[]{JIntellitype.MOD_SHIFT, JIntellitype.MOD_CONTROL, JIntellitype.MOD_WIN, JIntellitype.MOD_ALT}[key1Comb.getSelectedIndex()];
+				if (key2Txt.getText().length() > 0) {
+					StaticValue.printKey2=(int)key2Txt.getText().toUpperCase().charAt(0);
 				}else{
-					jkey.setText("B");
-					StaticValue.printKey2=(int)jkey.getText().toUpperCase().charAt(0);
+					key2Txt.setText("B");
+					StaticValue.printKey2=(int)key2Txt.getText().toUpperCase().charAt(0);
 				}
-				StaticValue.ocrEngine=cbx.getSelectedIndex();
-				StaticValue.ocrModel=cbx1.getSelectedIndex();
-				StaticValue.deviceBgColor = cbx2.getSelectedIndex() == 1 ? Color.black : Color.white;
-				StaticValue.deviceWidth=VeaUtil.valueOfInt(tf1.getText(), 630);
-				StaticValue.psFixed=r1.isSelected();
+				StaticValue.ocrEngine=ocrEngineComb.getSelectedIndex();
+				StaticValue.ocrModel=ocrModelComb.getSelectedIndex();
+				StaticValue.ocrTypesetting=ocrTypesettingComb.getSelectedIndex();
+				StaticValue.deviceBgColor = deviceBgComb.getSelectedIndex() == 1 ? Color.black : Color.white;
+				StaticValue.deviceWidth=VeaUtil.valueOfInt(deviceWidthTxt.getText(), 630);
+				StaticValue.psFixed=yesRad.isSelected();
 				StaticValue.write();
 				registerHotKey(StaticValue.printKey1, StaticValue.printKey2);
 			}
 		});
-		this.add(b1);
-		this.add(b2);
+		this.add(reset);
+		this.add(save);
 		
-		this.setSize(340, 200);
+		this.setSize(350, 300);
 		this.setResizable(false);
 		
 		registerHotKey(StaticValue.printKey1, StaticValue.printKey2);

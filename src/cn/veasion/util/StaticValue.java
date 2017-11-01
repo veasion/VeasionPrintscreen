@@ -1,10 +1,13 @@
 package cn.veasion.util;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.melloware.jintellitype.JIntellitype;
+
+import cn.veasion.util.ocr.OcrTextResult;
 
 /**
  * 静态值
@@ -55,6 +58,11 @@ public class StaticValue {
 	public static int ocrEngine = 0;
 	
 	/**
+	 * 文字识别结果排版 
+	 */
+	public static int ocrTypesetting = OcrTextResult.TYPESETTING_EQUALLY;
+	
+	/**
 	 * Face
 	 */
 	public static String faceApiKey="rGhXZjSqWLOluq04axCW80jCm21I-j32";
@@ -83,6 +91,7 @@ public class StaticValue {
     	map.put("baiduAppId", baiduAppId);
     	map.put("baiduApiKey", baiduApiKey);
     	map.put("baiduSecretKey", baiduSecretKey);
+    	map.put("ocrTypesetting", ocrTypesetting);
     	ConfigUtil.write(map);
     }
     
@@ -95,6 +104,7 @@ public class StaticValue {
     	psFixed=ConfigUtil.getPropertyBoolean("psFixed", false);
     	ocrEngine=VeaUtil.valueOfInt(ConfigUtil.getProperty("ocrEngine", String.valueOf(ocrEngine)), ocrEngine);
     	ocrModel=VeaUtil.valueOfInt(ConfigUtil.getProperty("ocrModel", String.valueOf(ocrModel)), ocrModel);
+    	ocrTypesetting=VeaUtil.valueOfInt(ConfigUtil.getProperty("ocrTypesetting", String.valueOf(ocrTypesetting)), ocrTypesetting);
     	faceApiKey=ConfigUtil.getProperty("faceApiKey", faceApiKey);
     	faceApiSecret=ConfigUtil.getProperty("faceApiSecret", faceApiSecret);
     	baiduAppId=ConfigUtil.getProperty("baiduAppId", baiduAppId);
