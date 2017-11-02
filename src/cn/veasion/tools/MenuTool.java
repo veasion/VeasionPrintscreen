@@ -367,41 +367,18 @@ public class MenuTool extends JPanel{
 			ocrTextCom.setFont(font);
 		}
 		
-		Rectangle re=r.getRect();
-		ocrWidth = (int)re.getWidth();
-		ocrHeight = (int)re.getHeight();
-		double maxWidth = Math.max(re.getX() - 0, Tools.SCREEN_WIDTH - re.getX() - re.getWidth());
-		if(ocrWidth < 400){
-			ocrWidth = 400;
-		} else if (ocrWidth > maxWidth) {
-			ocrWidth = (int)maxWidth - 6;
-			if(ocrWidth < 400){
-				ocrWidth = 400;
-			}
-		}
-		if(ocrHeight < 300){
-			ocrHeight = 300;
-		}else if(ocrHeight > Tools.SCREEN_HEIGHT / 2){
-			ocrHeight = (int)(Tools.SCREEN_HEIGHT / 2);
-			if(ocrHeight < 300){
-				ocrHeight = 300;
-			}
-		}
-		
-		int y = re.y - (re.height > ocrHeight ? -(re.height - ocrHeight) / 2 : (ocrHeight - re.height) / 2);
-		if (re.x + re.width + ocrWidth + 5 > Tools.SCREEN_WIDTH) {
-			ocrjp.setBounds(re.x - ocrWidth - 5, y, ocrWidth, ocrHeight);
+		Rectangle or=null;
+		if (StaticValue.ocrLocation == 1) {
+			or = this.ocrLocationX();
+		} else if (StaticValue.ocrLocation == 2) {
+			or = this.ocrLocationY();
 		} else {
-			ocrjp.setBounds(re.x + re.width + 5, y, ocrWidth, ocrHeight);
-		}
-		Rectangle or=ocrjp.getBounds();
-		if(or.x < 0){
-			or.x = 0;
-		}
-		if (or.y + or.height > Tools.SCREEN_HEIGHT) {
-			or.y = Tools.SCREEN_HEIGHT - or.height;
-		}else if(or.y < 0){
-			or.y = 0;
+			Rectangle re = r.getRect();
+			if (re.getWidth() > Tools.SCREEN_WIDTH / 2 - 10) {
+				or = this.ocrLocationY();
+			} else {
+				or = this.ocrLocationX();
+			}
 		}
 		ocrjp.setBounds(or);
 		ps.clearSelectRect();
@@ -450,6 +427,85 @@ public class MenuTool extends JPanel{
 		ocrTextCom.setDragEnabled(true);
 		ocrjp.add(new JScrollPane(ocrTextCom));
 	}
+	
+	/**
+	 * 计算OCR左右展示位置
+	 */
+	private Rectangle ocrLocationX(){
+		Rectangle re=r.getRect();
+		ocrWidth = (int)re.getWidth();
+		ocrHeight = (int)re.getHeight();
+		double maxWidth = Math.max(re.getX() - 0, Tools.SCREEN_WIDTH - re.getX() - re.getWidth()) - 6;
+		if (ocrWidth > maxWidth) {
+			ocrWidth = (int)maxWidth;
+		}
+		if(ocrWidth < 400){
+			ocrWidth = 400;
+		}
+		if(ocrHeight > Tools.SCREEN_HEIGHT / 2){
+			ocrHeight = (int)(Tools.SCREEN_HEIGHT / 2);
+		}
+		if(ocrHeight < 300){
+			ocrHeight = 300;
+		}
+		
+		int y = re.y - (re.height > ocrHeight ? -(re.height - ocrHeight) / 2 : (ocrHeight - re.height) / 2);
+		if (re.x + re.width + ocrWidth + 5 > Tools.SCREEN_WIDTH) {
+			ocrjp.setBounds(re.x - ocrWidth - 5, y, ocrWidth, ocrHeight);
+		} else {
+			ocrjp.setBounds(re.x + re.width + 5, y, ocrWidth, ocrHeight);
+		}
+		Rectangle or=ocrjp.getBounds();
+		if(or.x < 0){
+			or.x = 0;
+		}
+		if (or.y + or.height > Tools.SCREEN_HEIGHT) {
+			or.y = Tools.SCREEN_HEIGHT - or.height;
+		}else if(or.y < 0){
+			or.y = 0;
+		}
+		return or;
+	}
+	
+	/**
+	 * 计算OCR上下展示位置
+	 */
+	private Rectangle ocrLocationY(){
+		Rectangle re=r.getRect();
+		ocrWidth = (int)re.getWidth();
+		ocrHeight = (int)re.getHeight();
+		double maxHeight = Math.max(re.getY() - 0, Tools.SCREEN_WIDTH - re.getY() - re.getHeight()) - 6;
+		if (ocrWidth > Tools.SCREEN_WIDTH -20) {
+			ocrWidth = Tools.SCREEN_WIDTH -20;
+		}
+		if(ocrWidth < 400){
+			ocrWidth = 400;
+		}
+		if(ocrHeight > maxHeight){
+			ocrHeight = (int)maxHeight;
+		}
+		if(ocrHeight < 300){
+			ocrHeight = 300;
+		}
+		
+		int x= re.x - (re.width > ocrWidth ? -(re.width - ocrWidth) / 2 : (ocrWidth - re.width) / 2);
+		if (re.y + re.height + ocrHeight + 45 > Tools.SCREEN_HEIGHT) {
+			ocrjp.setBounds(x, re.y - ocrHeight - 5, ocrWidth, ocrHeight);
+		} else {
+			ocrjp.setBounds(x, re.y + re.height + 45, ocrWidth, ocrHeight);
+		}
+		Rectangle or=ocrjp.getBounds();
+		if(or.x < 0){
+			or.x = 0;
+		}
+		if (or.y + or.height > Tools.SCREEN_HEIGHT) {
+			or.y = Tools.SCREEN_HEIGHT - or.height;
+		}else if(or.y < 0){
+			or.y = 0;
+		}
+		return or;
+	}
+	
 	
 	public JPanel getOcrjp() {
 		return ocrjp;

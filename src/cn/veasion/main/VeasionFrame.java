@@ -38,30 +38,36 @@ public class VeasionFrame extends JFrame{
 	private Printscreen p=new Printscreen();
 	
 	public VeasionFrame(){
-		
-		this.setLayout(new GridLayout(0, 2));
+		GridLayout gridLayout=new GridLayout(0, 2);
+		this.setLayout(gridLayout);
 		this.setTitle(StaticValue.name+"截图工具 --Veasion");
 		this.setLocationRelativeTo(null);
 		
-		this.add(new JLabel("文字识别引擎："));
+		this.add(new JLabel(" 文字识别引擎："));
 		JComboBox<String> ocrEngineComb=new JComboBox<>(new String[]{"Face++", "百度云"});
 		ocrEngineComb.setSelectedIndex(StaticValue.ocrEngine);
 		this.add(ocrEngineComb);
 		
 		
-		this.add(new JLabel("文字识别模式："));
+		this.add(new JLabel(" 文字识别模式："));
 		JComboBox<String> ocrModelComb=new JComboBox<>(new String[]{"前台", "后台"});
 		ocrModelComb.setSelectedIndex(StaticValue.ocrModel);
 		this.add(ocrModelComb);
 		
 		
-		this.add(new JLabel("文字识别结果排版："));
+		this.add(new JLabel(" 文字识别结果展示："));
+		JComboBox<String> ocrLocationComb=new JComboBox<>(new String[]{"自动", "左右", "上下"});
+		ocrLocationComb.setSelectedIndex(StaticValue.ocrLocation);
+		this.add(ocrLocationComb);
+		
+		
+		this.add(new JLabel(" 文字识别结果排版："));
 		JComboBox<String> ocrTypesettingComb=new JComboBox<>(new String[]{"等间距", "忽略垂直间距", "忽略水平间距", "缩小间距", "不排版"});
 		ocrTypesettingComb.setSelectedIndex(StaticValue.ocrTypesetting);
 		this.add(ocrTypesettingComb);
 		
 		
-		this.add(new JLabel("自适应宽度："));
+		this.add(new JLabel(" 自适应宽度："));
 		JTextField deviceWidthTxt=new JTextField(String.valueOf(StaticValue.deviceWidth), 4);
 		deviceWidthTxt.addKeyListener(new KeyAdapter() {
 			@Override
@@ -83,7 +89,7 @@ public class VeasionFrame extends JFrame{
 		this.add(deviceWidthTxt);
 		
 		
-		this.add(new JLabel("截图快捷键："));
+		this.add(new JLabel(" 截图快捷键："));
 		JPanel panel=new JPanel(new GridLayout(1, 0));
 		JComboBox<String> key1Comb=new JComboBox<>(new String[]{"Shift", "Ctrl", "Win", "Alt"});
 		key1Comb.setSelectedIndex(indexModKeyIndex());
@@ -102,13 +108,13 @@ public class VeasionFrame extends JFrame{
 		this.add(panel);
 		
 		
-		this.add(new JLabel("自适应背景："));
+		this.add(new JLabel(" 自适应背景："));
 		JComboBox<String> deviceBgComb=new JComboBox<>(new String[]{"白色", "黑色"});
 		deviceBgComb.setSelectedIndex(StaticValue.deviceBgColor==Color.black ? 1 : 0);
 		this.add(deviceBgComb);
 		
 		
-		this.add(new JLabel("截图操作后是否固定截图框："));
+		this.add(new JLabel(" 截图操作后是否固定截图框："));
 		JPanel radioPanel=new JPanel(new GridLayout(1, 0));
 		JRadioButton yesRad=new JRadioButton("是", StaticValue.psFixed);
 		JRadioButton noRad=new JRadioButton("否", !StaticValue.psFixed);
@@ -118,7 +124,7 @@ public class VeasionFrame extends JFrame{
 		this.add(radioPanel);
 		
 		
-		this.add(new JLabel("配置文件："));
+		this.add(new JLabel(" 配置文件："));
 		JTextField configTxt=new JTextField(ConfigUtil.configPath);
 		configTxt.setEnabled(false);
 		configTxt.setToolTipText(configTxt.getText());
@@ -134,6 +140,7 @@ public class VeasionFrame extends JFrame{
 				ocrEngineComb.setSelectedIndex(0);
 				ocrModelComb.setSelectedIndex(0);
 				deviceBgComb.setSelectedIndex(0);
+				ocrLocationComb.setSelectedIndex(0);
 				ocrTypesettingComb.setSelectedIndex(0);
 				noRad.setSelected(true);
 				key2Txt.setText("B");
@@ -153,6 +160,7 @@ public class VeasionFrame extends JFrame{
 				}
 				StaticValue.ocrEngine=ocrEngineComb.getSelectedIndex();
 				StaticValue.ocrModel=ocrModelComb.getSelectedIndex();
+				StaticValue.ocrLocation=ocrLocationComb.getSelectedIndex();
 				StaticValue.ocrTypesetting=ocrTypesettingComb.getSelectedIndex();
 				StaticValue.deviceBgColor = deviceBgComb.getSelectedIndex() == 1 ? Color.black : Color.white;
 				StaticValue.deviceWidth=VeaUtil.valueOfInt(deviceWidthTxt.getText(), 630);
@@ -164,7 +172,7 @@ public class VeasionFrame extends JFrame{
 		this.add(reset);
 		this.add(save);
 		
-		this.setSize(350, 300);
+		this.setSize(350, 320);
 		this.setResizable(false);
 		
 		registerHotKey(StaticValue.printKey1, StaticValue.printKey2);

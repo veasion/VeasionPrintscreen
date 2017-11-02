@@ -62,6 +62,11 @@ public class StaticValue {
 	public static int ocrTypesetting = OcrTextResult.TYPESETTING_EQUALLY;
 
 	/**
+	 * 文字识别结果位置 ，0 自动，1 左右，2 上下
+	 */
+	public static int ocrLocation = 0;
+	
+	/**
 	 * Face
 	 */
 	public static String faceApiKey = "rGhXZjSqWLOluq04axCW80jCm21I-j32";
@@ -89,6 +94,7 @@ public class StaticValue {
 		map.put("baiduAppId", baiduAppId);
 		map.put("baiduApiKey", baiduApiKey);
 		map.put("baiduSecretKey", baiduSecretKey);
+		map.put("ocrLocation", ocrLocation);
 		map.put("ocrTypesetting", ocrTypesetting);
 		ConfigUtil.write(map);
 	}
@@ -102,6 +108,7 @@ public class StaticValue {
 		psFixed = ConfigUtil.getPropertyBoolean("psFixed", false);
 		ocrEngine = ConfigUtil.getProperty("ocrEngine", ocrEngine);
 		ocrModel = ConfigUtil.getProperty("ocrModel", ocrModel);
+		ocrLocation = ConfigUtil.getProperty("ocrLocation", ocrLocation);
 		ocrTypesetting = ConfigUtil.getProperty("ocrTypesetting", ocrTypesetting);
 		faceApiKey = ConfigUtil.getProperty("faceApiKey", faceApiKey);
 		faceApiSecret = ConfigUtil.getProperty("faceApiSecret", faceApiSecret);
