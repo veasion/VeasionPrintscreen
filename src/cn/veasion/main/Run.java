@@ -24,6 +24,7 @@ public class Run {
 				}
 			}
 		});
+		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		//最小化
 		frame.setExtendedState(JFrame.ICONIFIED);

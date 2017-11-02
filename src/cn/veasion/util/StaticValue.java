@@ -14,18 +14,18 @@ import cn.veasion.util.ocr.OcrTextResult;
  * @author zhuowei.luo
  */
 public class StaticValue {
-
+	
 	/**
 	 * Name
 	 */
 	public static final String name = "伟神";
-
+	
 	/**
 	 * 快捷键
 	 */
 	public static int printKey1 = JIntellitype.MOD_CONTROL;
 	public static int printKey2 = (int) 'B';
-
+	
 	/**
 	 * 自适应设备宽度
 	 */
@@ -35,27 +35,27 @@ public class StaticValue {
 	 * 自适应背景颜色
 	 */
 	public static Color deviceBgColor = Color.white;
-
+	
 	/**
 	 * 截图后是否固定
 	 */
-	public static boolean psFixed = false;
-
+	public static boolean psFixed = true;
+	
 	/**
 	 * 图片旋转统计范围
 	 */
 	public static int rangeValue = 3;
-
+	
 	/**
 	 * 文字识别模式，0 前台，1 后台
 	 */
 	public static int ocrModel = 0;
-
+	
 	/**
-	 * 文字识别引擎，0 face++，1 百度云
+	 * 文字识别引擎，0百度云，1 face++
 	 */
 	public static int ocrEngine = 0;
-
+	
 	/**
 	 * 文字识别结果排版
 	 */
@@ -69,8 +69,8 @@ public class StaticValue {
 	/**
 	 * Face
 	 */
-	public static String faceApiKey = "rGhXZjSqWLOluq04axCW80jCm21I-j32";
-	public static String faceApiSecret = "imOWbNz3RUJ8GcIepLdVvxvoFrJsS9e-";
+	public static String faceApiKey = "";
+	public static String faceApiSecret = "";
 
 	/**
 	 * 百度云
@@ -105,7 +105,7 @@ public class StaticValue {
 		printKey2 = ConfigUtil.getProperty("printKey2", printKey2);
 		deviceWidth = ConfigUtil.getProperty("deviceWidth", deviceWidth);
 		deviceBgColor = "黑色".equals(ConfigUtil.getProperty("deviceBgColor", "黑色")) ? Color.black : Color.white;
-		psFixed = ConfigUtil.getPropertyBoolean("psFixed", false);
+		psFixed = ConfigUtil.getPropertyBoolean("psFixed", true);
 		ocrEngine = ConfigUtil.getProperty("ocrEngine", ocrEngine);
 		ocrModel = ConfigUtil.getProperty("ocrModel", ocrModel);
 		ocrLocation = ConfigUtil.getProperty("ocrLocation", ocrLocation);

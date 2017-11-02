@@ -28,7 +28,12 @@ public class OcrTextBeanForBaidu implements OcrTextBean {
 		this.logId = json.optString("log_id");
 		this.resultCount = json.optInt("words_result_num", 0);
 		this.isSuccess = this.resultCount > 0;
-		this.fill();
+		if (!isSuccess) {
+			this.errorMessage = "识别发生错误！\n"+"error_msg：" + json.optString("error_msg") 
+						+ "\nerror_code：" + json.optString("error_code");
+		}else{
+			this.fill();
+		}
 	}
 
 	private void fill() {

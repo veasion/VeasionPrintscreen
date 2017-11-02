@@ -249,7 +249,7 @@ public class MenuTool extends JPanel{
 	public void ocrImage(){
 		Rectangle re = r.getRect();
 		Image img=ps.getScreenImage();
-		if(StaticValue.ocrEngine==0){
+		if (StaticValue.ocrEngine == 1) {
 			// face++ 图片识别压缩
 			if (re.width < 48 || re.height < 48) {
 				BufferedImage buff=new BufferedImage(re.width < 48 ? 50 : re.width, re.height < 48 ? 50 : re.height, BufferedImage.TYPE_INT_RGB);
@@ -284,12 +284,11 @@ public class MenuTool extends JPanel{
 		final Image imgTemp=img;
 		Thread t=new Thread(()->{
 			int fontSize=16;
-			String text=null;
+			String text="正在识别...";
 			try{
-				Tools.clipboard.setContents(new StringSelection("正在识别.."), null);
-				if(StaticValue.ocrEngine==1){
-					if(VeaUtil.isNullEmpty(StaticValue.baiduAppId)){
-						Tools.clipboard.setContents(new StringSelection("您没有权限访问百度云OCR，请与管理员联系（QQ：1456065030）"), null);
+				if (StaticValue.ocrEngine == 0) {
+					if(VeaUtil.isNullEmpty(StaticValue.baiduApiKey)){
+						text="\n          ========识别失败！=========\n\n     您还没有配置百度云文字识别的Key，\n请在设置界面中点击百度云进行配置，谢谢！\n\n如有疑问请联系\nQQ：1456065030\n";
 					}else{
 						AipOcr client = new AipOcr(StaticValue.baiduAppId, StaticValue.baiduApiKey, StaticValue.baiduSecretKey);
 						// 可选：设置网络连接参数
@@ -309,12 +308,16 @@ public class MenuTool extends JPanel{
 						text+="\r\n\r\n=======精度高的========\r\n\r\n"+new OcrTextResult(response).getResultTest();*/
 					}
 				}else{
-					ImageOperate imgOpe=new ImageOperate(StaticValue.faceApiKey, StaticValue.faceApiSecret);
-					OcrTextBeanForFace textBean=imgOpe.textRecognition(imgTemp);
-					OcrTextResult result=new OcrTextResult(textBean, StaticValue.ocrTypesetting);
-					text=result.getResultTest();
-					if(result.getAvgFontHeight() != null){
-						fontSize=result.getAvgFontHeight().intValue();
+					if(VeaUtil.isNullEmpty(StaticValue.faceApiKey)){
+						text="\n          ========识别失败！=========\n\n     您还没有配置Face++文字识别的Key，\n请在设置界面中点击Face++进行配置，谢谢！\n\n如有疑问请联系\nQQ：1456065030\n";
+					}else{
+						ImageOperate imgOpe=new ImageOperate(StaticValue.faceApiKey, StaticValue.faceApiSecret);
+						OcrTextBeanForFace textBean=imgOpe.textRecognition(imgTemp);
+						OcrTextResult result=new OcrTextResult(textBean, StaticValue.ocrTypesetting);
+						text=result.getResultTest();
+						if(result.getAvgFontHeight() != null){
+							fontSize=result.getAvgFontHeight().intValue();
+						}
 					}
 				}
 			}catch(Exception e){

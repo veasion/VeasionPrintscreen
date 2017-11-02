@@ -1,23 +1,30 @@
 package cn.veasion.main;
 
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 
+import cn.veasion.main.TextSaveDialog.KeyValue;
 import cn.veasion.util.ConfigUtil;
 import cn.veasion.util.StaticValue;
 import cn.veasion.util.VeaUtil;
@@ -37,14 +44,20 @@ public class VeasionFrame extends JFrame{
 	
 	private Printscreen p=new Printscreen();
 	
+	private VeasionFrame frame = null;
+	
 	public VeasionFrame(){
+		
+		frame=this;
+		
 		GridLayout gridLayout=new GridLayout(0, 2);
 		this.setLayout(gridLayout);
 		this.setTitle(StaticValue.name+"截图工具 --Veasion");
 		this.setLocationRelativeTo(null);
 		
+
 		this.add(new JLabel(" 文字识别引擎："));
-		JComboBox<String> ocrEngineComb=new JComboBox<>(new String[]{"Face++", "百度云"});
+		JComboBox<String> ocrEngineComb=new JComboBox<>(new String[]{"百度云", "Face++"});
 		ocrEngineComb.setSelectedIndex(StaticValue.ocrEngine);
 		this.add(ocrEngineComb);
 		
@@ -69,23 +82,6 @@ public class VeasionFrame extends JFrame{
 		
 		this.add(new JLabel(" 自适应宽度："));
 		JTextField deviceWidthTxt=new JTextField(String.valueOf(StaticValue.deviceWidth), 4);
-		deviceWidthTxt.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent e) {
-				int k=e.getKeyCode();
-				if (k != 8) {
-					if ((k >= 48 && k <= 57) || (k >= 96 && k <= 105) || k == 8) {
-						super.keyReleased(e);
-					} else {
-						deviceWidthTxt.setText(deviceWidthTxt.getText().replaceAll("\\D+", ""));
-					}
-					int v=VeaUtil.valueOfInt(deviceWidthTxt.getText(), 0);
-					if (v <= 0 || v > 5000) {
-						deviceWidthTxt.setText("630");
-					}
-				}
-			}
-		});
 		this.add(deviceWidthTxt);
 		
 		
@@ -96,14 +92,6 @@ public class VeasionFrame extends JFrame{
 		panel.add(key1Comb);
 		panel.add(new JLabel("+", JLabel.CENTER));
 		JTextField key2Txt=new JTextField(String.valueOf((char)StaticValue.printKey2));
-		key2Txt.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent e) {
-				if (key2Txt.getText().length() > 0) {
-					key2Txt.setText(key2Txt.getText().toUpperCase().substring(key2Txt.getText().length()-1));
-				}
-			}
-		});
 		panel.add(key2Txt);
 		this.add(panel);
 		
@@ -124,6 +112,15 @@ public class VeasionFrame extends JFrame{
 		this.add(radioPanel);
 		
 		
+		this.add(new JLabel(" 文字识别配置："));
+		JPanel ocrConfigPanel=new JPanel(new GridLayout(1, 2));
+		JButton baiduConfig=new JButton("百度云");
+		JButton faceConfig=new JButton("Face++");
+		ocrConfigPanel.add(baiduConfig);
+		ocrConfigPanel.add(faceConfig);
+		this.add(ocrConfigPanel);
+		
+		
 		this.add(new JLabel(" 配置文件："));
 		JTextField configTxt=new JTextField(ConfigUtil.configPath);
 		configTxt.setEnabled(false);
@@ -133,6 +130,104 @@ public class VeasionFrame extends JFrame{
 		
 		JButton reset=new JButton("重置");
 		JButton save=new JButton("保存");
+		
+		deviceWidthTxt.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				int k=e.getKeyCode();
+				if (k != 8) {
+					if ((k >= 48 && k <= 57) || (k >= 96 && k <= 105) || k == 8) {
+						super.keyReleased(e);
+					} else {
+						deviceWidthTxt.setText(deviceWidthTxt.getText().replaceAll("\\D+", ""));
+					}
+					int v=VeaUtil.valueOfInt(deviceWidthTxt.getText(), 0);
+					if (v <= 0 || v > 5000) {
+						deviceWidthTxt.setText("630");
+					}
+				}
+			}
+		});
+		
+		key2Txt.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (key2Txt.getText().length() > 0) {
+					key2Txt.setText(key2Txt.getText().toUpperCase().substring(key2Txt.getText().length()-1));
+				}
+			}
+		});
+		
+		faceConfig.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Map<String, KeyValue> map=new LinkedHashMap<>();
+				map.put("key", new KeyValue(" API Key：", StaticValue.faceApiKey));
+				map.put("secret", new KeyValue(" API Secret：", StaticValue.faceApiSecret));
+				TextSaveDialog dialog=new TextSaveDialog("Face++配置", 450, 140, map, frame);
+				dialog.addSaveActionListener(new ActionListener() {
+					@SuppressWarnings("deprecation")
+					public void actionPerformed(ActionEvent e) {
+						if (JOptionPane.showConfirmDialog(dialog, "请确认是否保存 ？", "提示",
+								JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+							StaticValue.faceApiKey = dialog.getValue("key");
+							StaticValue.faceApiSecret = dialog.getValue("secret");
+							StaticValue.write();
+							dialog.setVisible(false);
+							dialog.disable();
+						}
+					}
+				});
+				if(VeaUtil.isNullEmpty(StaticValue.faceApiKey)){
+					if (JOptionPane.showConfirmDialog(dialog, "您还没有Face++的文字识别key是否去注册并创建 ？（免费注册创建）", "温馨提示",
+							JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+			            try {
+			            	URI uri = new URI("https://console.faceplusplus.com.cn/register");
+							Desktop.getDesktop().browse(uri);
+						} catch (Exception e1) {
+							JOptionPane.showConfirmDialog(dialog, "打开浏览器发生错误："+e1.getMessage(), "错误", JOptionPane.OK_CANCEL_OPTION);
+						}
+					}
+				}
+			}
+		});
+		
+		baiduConfig.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Map<String, KeyValue> map=new LinkedHashMap<>();
+				map.put("id", new KeyValue(" AppID：", StaticValue.baiduAppId));
+				map.put("key", new KeyValue(" API Key：", StaticValue.baiduApiKey));
+				map.put("secret", new KeyValue(" Secret Key：", StaticValue.baiduSecretKey));
+				TextSaveDialog dialog=new TextSaveDialog("百度云配置", 450, 180, map, frame);
+				dialog.addSaveActionListener(new ActionListener() {
+					@SuppressWarnings("deprecation")
+					public void actionPerformed(ActionEvent e) {
+						if (JOptionPane.showConfirmDialog(dialog, "请确认是否保存 ？", "提示",
+								JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+							StaticValue.baiduAppId = dialog.getValue("id");
+							StaticValue.baiduApiKey = dialog.getValue("key");
+							StaticValue.baiduSecretKey = dialog.getValue("secret");
+							StaticValue.write();
+							dialog.setVisible(false);
+							dialog.disable();
+						}
+					}
+				});
+				if(VeaUtil.isNullEmpty(StaticValue.baiduApiKey)){
+					if (JOptionPane.showConfirmDialog(dialog, "您还没有百度云的文字识别key是否去注册并创建 ？（免费注册创建）", "温馨提示",
+							JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+						try {
+			            	URI uri = new URI("https://login.bce.baidu.com/");
+							Desktop.getDesktop().browse(uri);
+						} catch (Exception e1) {
+							JOptionPane.showConfirmDialog(dialog, "打开浏览器发生错误："+e1.getMessage(), "错误", JOptionPane.OK_CANCEL_OPTION);
+						}
+					}
+				}
+			}
+		});
+		
 		reset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -142,12 +237,13 @@ public class VeasionFrame extends JFrame{
 				deviceBgComb.setSelectedIndex(0);
 				ocrLocationComb.setSelectedIndex(0);
 				ocrTypesettingComb.setSelectedIndex(0);
-				noRad.setSelected(true);
+				yesRad.setSelected(true);
 				key2Txt.setText("B");
 				deviceWidthTxt.setText("630");
 				save.doClick();
 			}
 		});
+		
 		save.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -169,10 +265,11 @@ public class VeasionFrame extends JFrame{
 				registerHotKey(StaticValue.printKey1, StaticValue.printKey2);
 			}
 		});
+		
 		this.add(reset);
 		this.add(save);
 		
-		this.setSize(350, 320);
+		this.setSize(360, 350);
 		this.setResizable(false);
 		
 		registerHotKey(StaticValue.printKey1, StaticValue.printKey2);
