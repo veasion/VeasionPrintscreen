@@ -78,7 +78,7 @@ public class MenuTool extends JPanel{
 		this.setLayout(grid);
 		Font f=new Font("华文楷体", 1, 15);
 		JLabel label=new JLabel(StaticValue.name, JLabel.CENTER);
-		label.setToolTipText(StaticValue.name+"题库录入截图工具 --Veasion");
+		label.setToolTipText(StaticValue.name + "截图工具 --Veasion");
 		label.setForeground(new Color(237, 100, 20));
 		label.setFont(f);
 		JButton exit=new JButton("取消");
