@@ -77,6 +77,13 @@ public class VeasionFrame extends JFrame{
 		JComboBox<String> ocrTypesettingComb=new JComboBox<>(new String[]{"等间距", "忽略垂直间距", "忽略水平间距", "缩小间距", "不排版"});
 		ocrTypesettingComb.setSelectedIndex(StaticValue.ocrTypesetting);
 		this.add(ocrTypesettingComb);
+
+		
+		this.add(new JLabel(" 文字识别大小"));
+		final String[] sizes = { "自动识别", "10", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48"};
+		JComboBox<String> ocrSizeComb = new JComboBox<>(sizes);
+		ocrSizeComb.setSelectedIndex(this.getOcrSizeIndex(sizes));
+		this.add(ocrSizeComb);
 		
 		
 		this.add(new JLabel(" 自适应宽度："));
@@ -235,6 +242,7 @@ public class VeasionFrame extends JFrame{
 				ocrModelComb.setSelectedIndex(0);
 				deviceBgComb.setSelectedIndex(0);
 				ocrLocationComb.setSelectedIndex(0);
+				ocrSizeComb.setSelectedIndex(0);
 				ocrTypesettingComb.setSelectedIndex(0);
 				yesRad.setSelected(true);
 				key2Txt.setText("B");
@@ -257,6 +265,11 @@ public class VeasionFrame extends JFrame{
 				StaticValue.ocrModel=ocrModelComb.getSelectedIndex();
 				StaticValue.ocrLocation=ocrLocationComb.getSelectedIndex();
 				StaticValue.ocrTypesetting=ocrTypesettingComb.getSelectedIndex();
+				if (ocrSizeComb.getSelectedIndex() == 0) {
+					StaticValue.ocrSize = 0;
+				} else {
+					StaticValue.ocrSize = VeaUtil.valueOfInt(sizes[ocrSizeComb.getSelectedIndex()], 0);
+				}
 				StaticValue.deviceBgColor = deviceBgComb.getSelectedIndex() == 1 ? Color.black : Color.white;
 				StaticValue.deviceWidth=VeaUtil.valueOfInt(deviceWidthTxt.getText(), 630);
 				StaticValue.psFixed=yesRad.isSelected();
@@ -315,4 +328,16 @@ public class VeasionFrame extends JFrame{
 		}
 	}
 	
+	private int getOcrSizeIndex(String[] sizes) {
+		if (StaticValue.ocrSize <= 0 || sizes == null || sizes.length < 1) {
+			return 0;
+		}
+		String ocrSize = String.valueOf(StaticValue.ocrSize);
+		for (int i = 0, len = sizes.length; i < len; i++) {
+			if (sizes[i].equals(ocrSize)) {
+				return i;
+			}
+		}
+		return 0;
+	}
 }

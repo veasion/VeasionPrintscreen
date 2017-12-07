@@ -67,6 +67,11 @@ public class StaticValue {
 	public static int ocrLocation = 0;
 	
 	/**
+	 * 文字识别字体大小 ，0 自动
+	 */
+	public static int ocrSize = 0;
+	
+	/**
 	 * Face
 	 */
 	public static String faceApiKey = "";
@@ -79,6 +84,7 @@ public class StaticValue {
 	public static String baiduApiKey = "";
 	public static String baiduSecretKey = "";
 
+	
 	public static void write() {
 		// 写入配置
 		Map<String, Object> map = new HashMap<>();
@@ -96,6 +102,7 @@ public class StaticValue {
 		map.put("baiduSecretKey", baiduSecretKey);
 		map.put("ocrLocation", ocrLocation);
 		map.put("ocrTypesetting", ocrTypesetting);
+		map.put("ocrSize", ocrSize);
 		ConfigUtil.write(map);
 	}
 	
@@ -115,6 +122,7 @@ public class StaticValue {
 		baiduAppId = ConfigUtil.getProperty("baiduAppId", baiduAppId);
 		baiduApiKey = ConfigUtil.getProperty("baiduApiKey", baiduApiKey);
 		baiduSecretKey = ConfigUtil.getProperty("baiduSecretKey", baiduSecretKey);
+		ocrSize = ConfigUtil.getProperty("ocrSize", ocrSize);//修改文字大小
 	}
 	
 }

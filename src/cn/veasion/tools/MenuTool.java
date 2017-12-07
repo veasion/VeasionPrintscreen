@@ -299,8 +299,10 @@ public class MenuTool extends JPanel{
 						OcrTextBeanForBaidu response=new OcrTextBeanForBaidu(JSONObject.fromObject(json));
 						OcrTextResult result=new OcrTextResult(response, StaticValue.ocrTypesetting);
 						text=result.getResultTest();
-						if(result.getAvgFontHeight() != null){
+						if(StaticValue.ocrSize <= 0 && result.getAvgFontHeight() != null){
 							fontSize=result.getAvgFontHeight().intValue();
+						}else{
+							fontSize = StaticValue.ocrSize;
 						}
 						
 						/*json=client.accurateGeneral(data, new HashMap<String, String>()).toString();
@@ -315,8 +317,10 @@ public class MenuTool extends JPanel{
 						OcrTextBeanForFace textBean=imgOpe.textRecognition(imgTemp);
 						OcrTextResult result=new OcrTextResult(textBean, StaticValue.ocrTypesetting);
 						text=result.getResultTest();
-						if(result.getAvgFontHeight() != null){
+						if(StaticValue.ocrSize <= 0 && result.getAvgFontHeight() != null){
 							fontSize=result.getAvgFontHeight().intValue();
+						}else{
+							fontSize = StaticValue.ocrSize;
 						}
 					}
 				}
@@ -327,11 +331,6 @@ public class MenuTool extends JPanel{
 			Tools.clipboard.setContents(new StringSelection(text), null);
 			if(StaticValue.ocrModel==0){
 				ocrText = text;
-				if(fontSize < 9){
-					fontSize = 9;
-				}else if(fontSize > 22){
-					fontSize = 22;
-				}
 				ocrFont = new Font("宋体", 0, fontSize);
 				this.showOcrText(ocrText, ocrFont);
 			}
